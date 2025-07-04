@@ -5,9 +5,17 @@ export const wheelchairParts = [
     position: { x: 50, y: 15, z: 0 },
     description: 'Adjustable headrest provides comfortable support for the user\'s head and neck during operation.',
     howItWorks: 'The headrest can be adjusted for height and angle to accommodate different user preferences and medical needs.',
-    uses: 'Provides essential head and neck support, especially important during stair climbing operations where body position changes.',
-    image: '/assets/images/headrest.jpg',
-    icon: '🧑‍🦽'
+    media: {
+      type: 'image',
+      src: '/assets/images/headrest.jpg',
+      poster: '/assets/images/headrest-poster.jpg'
+    },
+    icon: '🧑‍🦽',
+    specs: [
+      { name: 'Adjustment Range', value: '150-300mm' },
+      { name: 'Material', value: 'Breathable mesh' }
+    ],
+    safetyNote: 'Ensure headrest is securely locked in position before use.'
   },
   {
     id: 'seat',
@@ -15,9 +23,17 @@ export const wheelchairParts = [
     position: { x: 50, y: 35, z: 0 },
     description: 'Fire-resistant cushioned seat with automatic tilt system for optimal positioning during different terrains.',
     howItWorks: 'The seat automatically adjusts its angle during stair climbing to maintain user comfort and safety. It can tilt within a 14-degree range.',
-    uses: 'Provides comfortable seating with safety features including fire-resistant materials and automatic positioning for stability.',
-    image: '/assets/images/seat.jpg',
-    icon: '🪑'
+    media: {
+      type: 'image',
+      src: '/assets/images/seat.jpg',
+      poster: '/assets/images/seat-poster.jpg'
+    },
+    icon: '🪑',
+    specs: [
+      { name: 'Width', value: '45 cm' },
+      { name: 'Tilt Range', value: '14 degrees' },
+      { name: 'Material', value: 'Fire-resistant fabric' }
+    ]
   },
   {
     id: 'remote-controller',
@@ -25,9 +41,18 @@ export const wheelchairParts = [
     position: { x: 65, y: 45, z: 0 },
     description: 'Advanced control system with joystick and LCD display for operating the wheelchair.',
     howItWorks: 'Features customizable sensitivity settings, speed control, mode selection (wheels/tracks), and displays battery status and error codes.',
-    uses: 'Complete control of wheelchair functions including movement, speed, mode switching, and system monitoring.',
-    image: '/assets/images/controller.jpg',
-    icon: '🎮'
+    media: {
+      type: 'image',
+      src: '/assets/images/controller.jpg',
+      poster: '/assets/images/controller-poster.jpg'
+    },
+    icon: '🎮',
+    specs: [
+      { name: 'Input Type', value: 'Joystick + buttons' },
+      { name: 'Display', value: 'LCD screen' },
+      { name: 'Range', value: '5 meters' }
+    ],
+    safetyNote: 'Keep controller dry and away from extreme temperatures.'
   },
   {
     id: 'armrest',
@@ -35,9 +60,17 @@ export const wheelchairParts = [
     position: { x: 35, y: 40, z: 0 },
     description: 'Adjustable armrests for user comfort and support.',
     howItWorks: 'Height adjustable from 150-300mm to accommodate different user needs and preferences.',
-    uses: 'Provides arm support and comfort during operation. Important safety note: Never lift wheelchair by armrests.',
-    image: '/assets/images/armrest.jpg',
-    icon: '🫳'
+    media: {
+      type: 'image',
+      src: '/assets/images/armrest.jpg',
+      poster: '/assets/images/armrest-poster.jpg'
+    },
+    icon: '🫳',
+    specs: [
+      { name: 'Adjustment Range', value: '150-300mm' },
+      { name: 'Material', value: 'Padded vinyl' }
+    ],
+    safetyNote: 'Never lift wheelchair by armrests.'
   },
   {
     id: 'legrest',
@@ -45,9 +78,17 @@ export const wheelchairParts = [
     position: { x: 50, y: 70, z: 0 },
     description: 'Adjustable leg support with footrest platform.',
     howItWorks: 'Length adjustable from 380-540mm. Can be adjusted mechanically or electrically depending on model.',
-    uses: 'Supports user\'s legs and feet. Safety warning: Never stand on footrests or use them for lifting the wheelchair.',
-    image: '/assets/images/legrest.jpg',
-    icon: '🦵'
+    media: {
+      type: 'image',
+      src: '/assets/images/legrest.jpg',
+      poster: '/assets/images/legrest-poster.jpg'
+    },
+    icon: '🦵',
+    specs: [
+      { name: 'Adjustment Range', value: '380-540mm' },
+      { name: 'Swing Away', value: 'Yes' }
+    ],
+    safetyNote: 'Never stand on footrests or use them for lifting the wheelchair.'
   },
   {
     id: 'drive-wheels',
@@ -55,9 +96,17 @@ export const wheelchairParts = [
     position: { x: 25, y: 55, z: 0 },
     description: 'Large 320-355mm drive wheels for smooth movement on flat surfaces.',
     howItWorks: 'Powered by 24V motors, these wheels provide movement up to 7-8 km/h on flat terrain with 18-25km range.',
-    uses: 'Primary propulsion system for movement on flat surfaces, sidewalks, and gentle slopes up to 15 degrees.',
-    image: '/assets/images/wheels.jpg',
-    icon: '🛞'
+    media: {
+      type: 'image',
+      src: '/assets/images/wheels.jpg',
+      poster: '/assets/images/wheels-poster.jpg'
+    },
+    icon: '🛞',
+    specs: [
+      { name: 'Diameter', value: '320-355mm' },
+      { name: 'Motor Power', value: '24V' },
+      { name: 'Max Speed', value: '8 km/h' }
+    ]
   },
   {
     id: 'track-system',
@@ -65,9 +114,18 @@ export const wheelchairParts = [
     position: { x: 50, y: 85, z: 0 },
     description: 'Revolutionary track system for climbing stairs and obstacles.',
     howItWorks: 'Activates via control panel to deploy tracks that can climb stairs up to 35° angle and steps up to 180mm high.',
-    uses: 'Enables stair climbing, curb navigation, and obstacle overcoming. Can handle 600-900 steps per charge.',
-    image: '/assets/images/tracks.jpg',
-    icon: '⛓️'
+    media: {
+      type: 'video',
+      src: '/assets/videos/tracks.mp4',
+      poster: '/assets/images/tracks-poster.jpg'
+    },
+    icon: '⛓️',
+    specs: [
+      { name: 'Max Stair Angle', value: '35°' },
+      { name: 'Max Step Height', value: '180mm' },
+      { name: 'Steps per Charge', value: '600-900' }
+    ],
+    safetyNote: 'Ensure proper training before attempting stair climbing.'
   },
   {
     id: 'battery',
@@ -75,9 +133,18 @@ export const wheelchairParts = [
     position: { x: 75, y: 65, z: 0 },
     description: 'High-capacity AGM or Lithium battery system.',
     howItWorks: '33-42 A*h capacity batteries charged with included 220V charger. Features automatic monitoring and safety systems.',
-    uses: 'Powers all wheelchair functions. Provides 18-25km range on wheels or 600-900 steps on tracks.',
-    image: '/assets/images/battery.jpg',
-    icon: '🔋'
+    media: {
+      type: 'image',
+      src: '/assets/images/battery.jpg',
+      poster: '/assets/images/battery-poster.jpg'
+    },
+    icon: '🔋',
+    specs: [
+      { name: 'Capacity', value: '33-42 A*h' },
+      { name: 'Type', value: 'AGM/Lithium' },
+      { name: 'Charge Time', value: '6-8 hours' }
+    ],
+    safetyNote: 'Only use approved charger and follow charging instructions.'
   },
   {
     id: 'safety-handle',
@@ -85,9 +152,17 @@ export const wheelchairParts = [
     position: { x: 50, y: 25, z: 0 },
     description: 'Special handles for safe transport and assistance.',
     howItWorks: 'Reinforced handles designed specifically for lifting and maneuvering the wheelchair safely.',
-    uses: 'Only safe points for lifting wheelchair. Attendants should use these handles or front frame beam only.',
-    image: '/assets/images/handle.jpg',
-    icon: '🫴'
+    media: {
+      type: 'image',
+      src: '/assets/images/handle.jpg',
+      poster: '/assets/images/handle-poster.jpg'
+    },
+    icon: '🫴',
+    specs: [
+      { name: 'Material', value: 'Reinforced steel' },
+      { name: 'Weight Capacity', value: '115 kg' }
+    ],
+    safetyNote: 'Attendants should use these handles or front frame beam only for lifting.'
   },
   {
     id: 'backrest',
@@ -95,9 +170,16 @@ export const wheelchairParts = [
     position: { x: 50, y: 20, z: 0 },
     description: 'Ergonomic back support with adjustable recline feature.',
     howItWorks: 'Can be adjusted to multiple angles for optimal comfort and support during different activities.',
-    uses: 'Provides back support and can be reclined for resting positions. Includes lumbar support for long-term use.',
-    image: '/assets/images/backrest.jpg',
-    icon: '🪑'
+    media: {
+      type: 'image',
+      src: '/assets/images/backrest.jpg',
+      poster: '/assets/images/backrest-poster.jpg'
+    },
+    icon: '🪑',
+    specs: [
+      { name: 'Recline Angles', value: '5 positions' },
+      { name: 'Lumbar Support', value: 'Adjustable' }
+    ]
   },
   {
     id: 'footplate',
@@ -105,9 +187,17 @@ export const wheelchairParts = [
     position: { x: 50, y: 75, z: 0 },
     description: 'Adjustable foot support platform.',
     howItWorks: 'Can be raised, lowered, and angled to accommodate different leg lengths and positions.',
-    uses: 'Supports feet and legs in comfortable position. Swivels out of the way for transfers.',
-    image: '/assets/images/footplate.jpg',
-    icon: '👣'
+    media: {
+      type: 'image',
+      src: '/assets/images/footplate.jpg',
+      poster: '/assets/images/footplate-poster.jpg'
+    },
+    icon: '👣',
+    specs: [
+      { name: 'Adjustment', value: 'Height and angle' },
+      { name: 'Swivel', value: 'Yes' }
+    ],
+    safetyNote: 'Ensure footplate is properly secured before moving.'
   },
   {
     id: 'control-panel',
@@ -115,9 +205,17 @@ export const wheelchairParts = [
     position: { x: 60, y: 40, z: 0 },
     description: 'User interface for wheelchair operation.',
     howItWorks: 'Includes joystick for movement control, mode selection buttons, and status indicators.',
-    uses: 'Primary interface for operating the wheelchair. Includes emergency stop function.',
-    image: '/assets/images/control-panel.jpg',
-    icon: '🕹️'
+    media: {
+      type: 'image',
+      src: '/assets/images/control-panel.jpg',
+      poster: '/assets/images/control-panel-poster.jpg'
+    },
+    icon: '🕹️',
+    specs: [
+      { name: 'Controls', value: 'Joystick + buttons' },
+      { name: 'Display', value: 'Status indicators' }
+    ],
+    safetyNote: 'Familiarize yourself with all controls before operation.'
   }
 ];
 

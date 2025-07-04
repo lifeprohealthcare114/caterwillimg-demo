@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { wheelchairParts, keySpecs } from '../../constants/wheelchairParts';
+import { wheelchairParts, keySpecs, wheelchairFeatures } from '../../constants/wheelchairParts';
 import PartModal from '../../components/PartModal/PartModal';
 import ThreeDViewer from '../../components/ThreeDViewer/ThreeDViewer';
 import SpecsCard from '../../components/SpecsCard/SpecsCard';
@@ -8,32 +8,69 @@ import './Home.css';
 const Home = () => {
   const [selectedPart, setSelectedPart] = useState(null);
 
+  const handlePartClick = (part) => {
+    const completePart = {
+      ...part,
+      media: part.media || {
+        type: 'image',
+        src: '/assets/images/placeholder-part.jpg',
+        poster: '/assets/images/placeholder-poster.jpg'
+      },
+      specs: part.specs || [],
+      safetyNote: part.safetyNote || null
+    };
+    setSelectedPart(completePart);
+  };
+
   return (
     <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section">
+        <div className="video-container">
+          <video
+            className="video-background"
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="/assets/videos/poster.jpg"
+          >
+            <source src="/assets/videos/wheelchair-hero.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div className="overlay"></div>
+        
         <div className="hero-content">
-          <h1 className="hero-title">Revolutionary Stair-Climbing Wheelchair</h1>
+          <h1 className="hero-title">Caterwil GTS Wheelchair</h1>
           <p className="hero-text">
-            Experience the future of mobility with our innovative wheelchair that combines
-            comfort, safety, and unparalleled stair-climbing capabilities.
+            Experience revolutionary mobility with our advanced stair-climbing wheelchair technology.
           </p>
           <button 
             className="hero-button"
-            onClick={() => document.getElementById('viewer-section').scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => {
+              document.getElementById('viewer-section').scrollIntoView({ 
+                behavior: 'smooth' 
+              });
+            }}
           >
-            Explore the 360° View
+            Explore 360° View
           </button>
         </div>
       </section>
 
       {/* 3D Viewer Section */}
       <section id="viewer-section" className="viewer-section">
-        <h2 className="section-title">Interactive Wheelchair Explorer</h2>
-        <p className="section-subtitle">Click on any part to learn more about its features</p>
+        <div className="section-header">
+          <h2 className="section-title">Interactive Wheelchair Explorer</h2>
+        </div>
+        <p className="section-subtitle">Click on any highlighted part to learn more</p>
         
         <div className="viewer-container">
-          <ThreeDViewer parts={wheelchairParts} onPartClick={setSelectedPart} />
+          <ThreeDViewer 
+            parts={wheelchairParts} 
+            onPartClick={handlePartClick}
+          />
         </div>
       </section>
 
@@ -41,34 +78,41 @@ const Home = () => {
       <section className="features-section">
         <h2 className="section-title">Key Features</h2>
         <div className="features-grid">
-          <div className="feature-card">
-            <h3>Dual Mode Operation</h3>
-            <p>Switch seamlessly between wheels for flat surfaces and tracks for stairs and rough terrain.</p>
-          </div>
-          <div className="feature-card">
-            <h3>Safety Mechanisms</h3>
-            <p>Anti-tip system, emergency brakes, and stability control ensure user safety in all conditions.</p>
-          </div>
-          <div className="feature-card">
-            <h3>Ergonomic Design</h3>
-            <p>Adjustable seating, armrests, and controls tailored to individual user needs.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Technical Specifications */}
-      <section className="specs-section">
-        <h2 className="section-title">Technical Specifications</h2>
-        <div className="specs-grid">
-          {keySpecs.map((spec, index) => (
-            <SpecsCard key={index} title={spec.title} value={spec.value} icon={spec.icon} />
+          {wheelchairFeatures.map((feature, index) => (
+            <div key={index} className="feature-card">
+              <div className="feature-icon">{feature.icon}</div>
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Part Detail Modal */}
+      {/* Technical Specifications Section */}
+      <section className="specs-section">
+        <h2 className="section-title">Technical Specifications</h2>
+        <div className="specs-grid">
+          {keySpecs.map((spec, index) => (
+            <SpecsCard 
+              key={index}
+              title={spec.title}
+              value={spec.value}
+              icon={spec.icon}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Part Modal */}
       {selectedPart && (
-        <PartModal part={selectedPart} onClose={() => setSelectedPart(null)} />
+        <PartModal 
+          part={selectedPart} 
+          onClose={() => {
+            setSelectedPart(null);
+          }}
+          parts={wheelchairParts}
+          setSelectedPart={handlePartClick}
+        />
       )}
     </div>
   );
