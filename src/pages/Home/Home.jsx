@@ -97,7 +97,7 @@ const Home = () => {
       </section>
 
       {/* Technical Specifications Section */}
-      <section className="specs-section">
+      {/* <section className="specs-section">
         <h2 className="section-title">Technical Specifications</h2>
         <div className="specs-grid">
           {keySpecs.map((spec, index) => (
@@ -109,7 +109,7 @@ const Home = () => {
             />
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Part Modal */}
       {selectedPart && (

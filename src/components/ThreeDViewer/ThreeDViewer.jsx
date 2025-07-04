@@ -12,6 +12,19 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
   const [visibleParts, setVisibleParts] = useState(new Set());
   const rotationSpeed = useRef(0.002);
 
+  // Center the model and adjust scale
+  useEffect(() => {
+    if (scene) {
+      const box = new THREE.Box3().setFromObject(scene);
+      const center = box.getCenter(new THREE.Vector3());
+      scene.position.sub(center);
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 2 / maxDim;
+      scene.scale.set(scale, scale, scale);
+    }
+  }, [scene]);
+
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.rotation.y += rotationSpeed.current;
@@ -34,6 +47,7 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
     setVisibleParts(newVisibleParts);
   });
 
+  // Focus camera on part when selected
   useEffect(() => {
     if (focusedPart && camera) {
       const part = parts.find(p => p.id === focusedPart);
@@ -54,12 +68,8 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
   };
 
   return (
-    <primitive 
-      ref={groupRef}
-      object={scene} 
-      scale={1} 
-      position={[0, -0.5, 0]}
-    >
+    <group ref={groupRef} position={[0, -0.5, 0]}>
+      <primitive object={scene} />
       {parts.map((part) => (
         <group 
           key={part.id} 
@@ -123,7 +133,7 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
           )}
         </group>
       ))}
-    </primitive>
+    </group>
   );
 };
 
@@ -151,7 +161,14 @@ const ThreeDViewer = ({ parts, onPartClick, isModalOpen }) => {
 
   return (
     <div className="three-d-viewer">
-      <Canvas camera={{ position: [0, 0, 3], fov: 50 }}>
+      <Canvas 
+        camera={{ 
+          position: [0, 0, 2.5], 
+          fov: 50,
+          near: 0.1,
+          far: 1000 
+        }}
+      >
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <Model 
@@ -165,12 +182,11 @@ const ThreeDViewer = ({ parts, onPartClick, isModalOpen }) => {
           ref={controlsRef}
           enableZoom={true}
           enablePan={false}
+          minDistance={1.5}
+          maxDistance={5}
           minPolarAngle={Math.PI/6}
           maxPolarAngle={Math.PI/2}
-          target={focusedPart ? 
-            [parts.find(p => p.id === focusedPart).position.x/50-1, 
-             parts.find(p => p.id === focusedPart).position.y/50-1, 
-             0] : [0, 0, 0]}
+          target={[0, 0, 0]}
           enableDamping={true}
           dampingFactor={0.05}
           autoRotate={!focusedPart}
