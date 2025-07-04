@@ -7,6 +7,7 @@ import './Home.css';
 
 const Home = () => {
   const [selectedPart, setSelectedPart] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePartClick = (part) => {
     const completePart = {
@@ -20,6 +21,12 @@ const Home = () => {
       safetyNote: part.safetyNote || null
     };
     setSelectedPart(completePart);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPart(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -70,6 +77,7 @@ const Home = () => {
           <ThreeDViewer 
             parts={wheelchairParts} 
             onPartClick={handlePartClick}
+            isModalOpen={isModalOpen}
           />
         </div>
       </section>
@@ -107,9 +115,7 @@ const Home = () => {
       {selectedPart && (
         <PartModal 
           part={selectedPart} 
-          onClose={() => {
-            setSelectedPart(null);
-          }}
+          onClose={handleCloseModal}
           parts={wheelchairParts}
           setSelectedPart={handlePartClick}
         />

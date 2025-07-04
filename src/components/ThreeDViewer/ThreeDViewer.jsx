@@ -13,12 +13,10 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
   const rotationSpeed = useRef(0.002);
 
   useFrame(() => {
-    // Permanent auto-rotation
     if (groupRef.current) {
       groupRef.current.rotation.y += rotationSpeed.current;
     }
 
-    // Calculate visible parts
     const newVisibleParts = new Set();
     parts.forEach(part => {
       const partPosition = new THREE.Vector3(
@@ -36,7 +34,6 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
     setVisibleParts(newVisibleParts);
   });
 
-  // Focus camera on part when selected
   useEffect(() => {
     if (focusedPart && camera) {
       const part = parts.find(p => p.id === focusedPart);
@@ -50,6 +47,11 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
       }
     }
   }, [focusedPart, camera, parts]);
+
+  const handlePartClick = (part) => {
+    onPartClick(part);
+    setFocusedPart(part.id);
+  };
 
   return (
     <primitive 
@@ -65,15 +67,47 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
         >
           {(visibleParts.has(part.id) || focusedPart === part.id) && (
             <>
+              <line>
+                <bufferGeometry attach="geometry" 
+                  onUpdate={self => {
+                    self.setFromPoints([
+                      new THREE.Vector3(0, 0, 0),
+                      new THREE.Vector3(0.5, 0.5, 0)
+                    ]);
+                  }} 
+                />
+                <lineBasicMaterial 
+                  attach="material" 
+                  color={focusedPart === part.id ? "#ef4444" : "#3b82f6"} 
+                  linewidth={2}
+                />
+              </line>
+
+              {!focusedPart && (
+                <Html center>
+                  <div 
+                    className={`part-label ${hoveredPart === part.id ? 'hovered' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePartClick(part);
+                    }}
+                    onPointerOver={() => setHoveredPart(part.id)}
+                    onPointerOut={() => setHoveredPart(null)}
+                  >
+                    {part.name}
+                  </div>
+                </Html>
+              )}
+
               <mesh
-                onClick={() => {
-                  onPartClick(part);
-                  setFocusedPart(part.id);
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePartClick(part);
                 }}
                 onPointerOver={() => setHoveredPart(part.id)}
                 onPointerOut={() => setHoveredPart(null)}
               >
-                <sphereGeometry args={[0.05, 16, 16]} />
+                <sphereGeometry args={[0.03, 16, 16]} />
                 <meshStandardMaterial 
                   color={
                     focusedPart === part.id ? "#ef4444" : 
@@ -85,22 +119,6 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
                   opacity={0.8}
                 />
               </mesh>
-              {(hoveredPart === part.id || focusedPart === part.id) && (
-                <Html center>
-                  <div className={`hotspot-tooltip ${focusedPart === part.id ? 'focused' : ''}`}>
-                    <div className="tooltip-arrow"></div>
-                    {part.name}
-                  </div>
-                </Html>
-              )}
-              <line>
-                <bufferGeometry attach="geometry" />
-                <lineBasicMaterial 
-                  attach="material" 
-                  color={focusedPart === part.id ? "#ef4444" : "#3b82f6"} 
-                  linewidth={1}
-                />
-              </line>
             </>
           )}
         </group>
@@ -109,7 +127,7 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
   );
 };
 
-const ThreeDViewer = ({ parts, onPartClick }) => {
+const ThreeDViewer = ({ parts, onPartClick, isModalOpen }) => {
   const [focusedPart, setFocusedPart] = useState(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const controlsRef = useRef();
@@ -117,6 +135,12 @@ const ThreeDViewer = ({ parts, onPartClick }) => {
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
+
+  useEffect(() => {
+    if (!isModalOpen) {
+      setFocusedPart(null);
+    }
+  }, [isModalOpen]);
 
   const handleResetView = () => {
     setFocusedPart(null);
