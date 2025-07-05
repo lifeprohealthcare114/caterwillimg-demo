@@ -28,6 +28,21 @@ const Home = () => {
     setIsModalOpen(false);
   };
 
+  // Function to handle part selection from modal navigation
+  const handleModalPartSelect = (part) => {
+    const completePart = {
+      ...part,
+      media: part.media || {
+        type: 'image',
+        src: '/assets/images/placeholder-part.jpg',
+        poster: '/assets/images/placeholder-poster.jpg'
+      },
+      specs: part.specs || [],
+      safetyNote: part.safetyNote || null
+    };
+    setSelectedPart(completePart);
+  };
+
   return (
     <div className="home-page">
       {/* Hero Section */}
@@ -41,7 +56,7 @@ const Home = () => {
             playsInline
             poster="/assets/videos/poster.jpg"
           >
-            <source src="/assets/videos/wheelchair-hero.mp4" type="video/mp4" />
+            <source src="/assets/videos/wheelchair.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
@@ -116,7 +131,7 @@ const Home = () => {
           part={selectedPart} 
           onClose={handleCloseModal}
           parts={wheelchairParts}
-          setSelectedPart={handlePartClick}
+          setSelectedPart={handleModalPartSelect}
         />
       )}
     </div>

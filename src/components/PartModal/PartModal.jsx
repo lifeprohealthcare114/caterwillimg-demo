@@ -9,50 +9,123 @@ const PartModal = ({
   setSelectedPart
 }) => {
   const videoRef = useRef(null);
+  const playPromiseRef = useRef(null);
   const [currentPartIndex, setCurrentPartIndex] = useState(
     parts.findIndex(p => p.id === part.id)
   );
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [showSpecs, setShowSpecs] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
 
-  // Ensure media object exists with defaults
   const media = part.media || {
     type: 'image',
     src: '/assets/images/placeholder-part.jpg',
     poster: '/assets/images/placeholder-poster.jpg'
   };
 
-  const togglePlayback = useCallback(() => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play().catch(error => {
-          console.error('Video playback error:', error);
-        });
-      }
-      setIsPlaying(!isPlaying);
+  const safePlay = useCallback(() => {
+    if (!videoRef.current) return Promise.resolve();
+    
+    // Cancel any existing play promise
+    if (playPromiseRef.current) {
+      playPromiseRef.current.catch(() => {});
     }
-  }, [isPlaying]);
+    
+    const playPromise = videoRef.current.play();
+    playPromiseRef.current = playPromise;
+    
+    return playPromise
+      .then(() => {
+        if (playPromiseRef.current === playPromise) {
+          setIsPlaying(true);
+          playPromiseRef.current = null;
+        }
+      })
+      .catch(error => {
+        if (playPromiseRef.current === playPromise) {
+          console.log('Play failed:', error);
+          setIsPlaying(false);
+          playPromiseRef.current = null;
+        }
+      });
+  }, []);
 
-  const navigateParts = useCallback((direction) => {
+  const safePause = useCallback(() => {
+    if (!videoRef.current) return;
+    
+    // Cancel any pending play promise
+    if (playPromiseRef.current) {
+      playPromiseRef.current.catch(() => {});
+      playPromiseRef.current = null;
+    }
+    
+    videoRef.current.pause();
+    setIsPlaying(false);
+  }, []);
+
+  const togglePlayback = useCallback(() => {
+    if (!videoRef.current) return;
+    
+    setUserInteracted(true);
+    
+    if (!isPlaying) {
+      safePlay();
+    } else {
+      safePause();
+    }
+  }, [isPlaying, safePlay, safePause]);
+
+  const navigateParts = useCallback(async (direction) => {
+    // Pause current video before navigating
+    if (videoRef.current && media.type === 'video') {
+      await safePause();
+    }
+    
     let newIndex = currentPartIndex + direction;
     if (newIndex < 0) newIndex = parts.length - 1;
     if (newIndex >= parts.length) newIndex = 0;
     setCurrentPartIndex(newIndex);
     setSelectedPart(parts[newIndex]);
-    setIsPlaying(true);
-  }, [currentPartIndex, parts, setSelectedPart]);
+    setUserInteracted(false);
+  }, [currentPartIndex, parts, setSelectedPart, media.type, safePause]);
+
+  // Video initialization and autoplay handling
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement || media.type !== 'video') return;
+
+    videoElement.muted = true;
+    videoElement.playsInline = true;
+    videoElement.preload = 'auto';
+
+    let timeoutId;
+
+    const attemptAutoplay = async () => {
+      if (!userInteracted) {
+        try {
+          await safePlay();
+        } catch (error) {
+          console.log('Autoplay attempt failed (normal for some browsers):', error);
+        }
+      }
+    };
+
+    // Only attempt autoplay if user hasn't interacted
+    timeoutId = setTimeout(attemptAutoplay, 300);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (playPromiseRef.current) {
+        playPromiseRef.current.catch(() => {});
+        playPromiseRef.current = null;
+      }
+    };
+  }, [currentPartIndex, media.type, userInteracted, safePlay]);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    const videoElement = videoRef.current;
-    
     return () => {
       document.body.style.overflow = 'auto';
-      if (videoElement) {
-        videoElement.pause();
-      }
     };
   }, []);
 
@@ -61,7 +134,10 @@ const PartModal = ({
       if (e.key === 'ArrowLeft') navigateParts(-1);
       if (e.key === 'ArrowRight') navigateParts(1);
       if (e.key === 'Escape') onClose();
-      if (e.key === ' ') togglePlayback();
+      if (e.key === ' ') {
+        e.preventDefault();
+        togglePlayback();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -131,8 +207,8 @@ const PartModal = ({
                 <video
                   ref={videoRef}
                   controls={false}
-                  autoPlay
                   muted
+                  playsInline
                   loop
                   poster={media.poster}
                   className="part-media"
