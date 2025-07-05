@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, Info, AlertTriangle } from 'lucide-react';
 import './PartModal.css';
 
@@ -22,35 +22,39 @@ const PartModal = ({
     poster: '/assets/images/placeholder-poster.jpg'
   };
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
-    };
-  }, []);
-
-  const togglePlayback = () => {
+  const togglePlayback = useCallback(() => {
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
       } else {
-        videoRef.current.play();
+        videoRef.current.play().catch(error => {
+          console.error('Video playback error:', error);
+        });
       }
       setIsPlaying(!isPlaying);
     }
-  };
+  }, [isPlaying]);
 
-  const navigateParts = (direction) => {
+  const navigateParts = useCallback((direction) => {
     let newIndex = currentPartIndex + direction;
     if (newIndex < 0) newIndex = parts.length - 1;
     if (newIndex >= parts.length) newIndex = 0;
     setCurrentPartIndex(newIndex);
     setSelectedPart(parts[newIndex]);
-    setIsPlaying(true); // Auto-play when changing parts
-  };
+    setIsPlaying(true);
+  }, [currentPartIndex, parts, setSelectedPart]);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const videoElement = videoRef.current;
+    
+    return () => {
+      document.body.style.overflow = 'auto';
+      if (videoElement) {
+        videoElement.pause();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -62,7 +66,7 @@ const PartModal = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentPartIndex]);
+  }, [navigateParts, onClose, togglePlayback]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
