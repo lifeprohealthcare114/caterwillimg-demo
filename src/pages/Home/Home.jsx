@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { wheelchairParts, keySpecs, wheelchairFeatures } from '../../constants/wheelchairParts';
+import { useState } from 'react';
+import { wheelchairParts, wheelchairFeatures } from '../../constants/wheelchairParts';
 import PartModal from '../../components/PartModal/PartModal';
 import ThreeDViewer from '../../components/ThreeDViewer/ThreeDViewer';
-import SpecsCard from '../../components/SpecsCard/SpecsCard';
 import './Home.css';
 
 const Home = () => {
