@@ -1,7 +1,9 @@
+// components/ThreeDViewer/ThreeDViewer.js
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Html, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
+import WebGLErrorBoundary from '../WebGLErrorBoundary';
 import './ThreeDViewer.css';
 
 const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
@@ -12,7 +14,6 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
   const [visibleParts, setVisibleParts] = useState(new Set());
   const rotationSpeed = useRef(0.002);
 
-  // Center the model and adjust scale
   useEffect(() => {
     if (scene) {
       const box = new THREE.Box3().setFromObject(scene);
@@ -47,7 +48,6 @@ const Model = ({ url, parts, onPartClick, focusedPart, setFocusedPart }) => {
     setVisibleParts(newVisibleParts);
   });
 
-  // Focus camera on part when selected
   useEffect(() => {
     if (focusedPart && camera) {
       const part = parts.find(p => p.id === focusedPart);
@@ -161,38 +161,45 @@ const ThreeDViewer = ({ parts, onPartClick, isModalOpen }) => {
 
   return (
     <div className="three-d-viewer">
-      <Canvas 
-        camera={{ 
-          position: [0, 0, 2.5], 
-          fov: 50,
-          near: 0.1,
-          far: 1000 
-        }}
-      >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} />
-        <Model 
-          url="/assets/models/result.gltf"
-          parts={parts} 
-          onPartClick={onPartClick}
-          focusedPart={focusedPart}
-          setFocusedPart={setFocusedPart}
-        />
-        <OrbitControls 
-          ref={controlsRef}
-          enableZoom={true}
-          enablePan={false}
-          minDistance={1.5}
-          maxDistance={5}
-          minPolarAngle={Math.PI/6}
-          maxPolarAngle={Math.PI/2}
-          target={[0, 0, 0]}
-          enableDamping={true}
-          dampingFactor={0.05}
-          autoRotate={!focusedPart}
-          autoRotateSpeed={1}
-        />
-      </Canvas>
+      <WebGLErrorBoundary>
+        <Canvas 
+          camera={{ 
+            position: [0, 0, 2.5], 
+            fov: 50,
+            near: 0.1,
+            far: 1000 
+          }}
+          gl={{
+            antialias: true,
+            powerPreference: "high-performance",
+            alpha: true
+          }}
+        >
+          <ambientLight intensity={0.5} />
+          <pointLight position={[10, 10, 10]} />
+          <Model 
+            url="/assets/models/result.gltf"
+            parts={parts} 
+            onPartClick={onPartClick}
+            focusedPart={focusedPart}
+            setFocusedPart={setFocusedPart}
+          />
+          <OrbitControls 
+            ref={controlsRef}
+            enableZoom={true}
+            enablePan={false}
+            minDistance={1.5}
+            maxDistance={5}
+            minPolarAngle={Math.PI/6}
+            maxPolarAngle={Math.PI/2}
+            target={[0, 0, 0]}
+            enableDamping={true}
+            dampingFactor={0.05}
+            autoRotate={!focusedPart}
+            autoRotateSpeed={1}
+          />
+        </Canvas>
+      </WebGLErrorBoundary>
       
       <div className="viewer-controls">
         <button 

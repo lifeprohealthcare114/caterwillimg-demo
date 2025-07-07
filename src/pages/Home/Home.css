@@ -1,10 +1,10 @@
+/* src/pages/Home/Home.css */
 .home-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0;
 }
 
-/* Hero Section */
 .hero-section {
   position: relative;
   height: 100vh;
@@ -15,7 +15,6 @@
   text-align: center;
   color: white;
   overflow: hidden;
-  margin-bottom: 40px;
 }
 
 .video-container {
@@ -93,6 +92,8 @@
   transition: all 0.3s ease;
   text-shadow: none;
   animation: fadeInUp 1s ease 0.4s both;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .hero-button:hover {
@@ -101,100 +102,6 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Section Styles */
-.section-title {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #1e3a8a;
-  position: relative;
-  display: inline-block;
-}
-
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 3px;
-  background-color: #3b82f6;
-}
-
-.section-subtitle {
-  text-align: center;
-  color: #64748b;
-  margin-bottom: 40px;
-  font-size: 1.1rem;
-}
-
-.viewer-section {
-  margin: 60px 0;
-  animation: fadeIn 1s ease;
-}
-
-.viewer-container {
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.viewer-container:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.features-section {
-  margin: 60px 0;
-  animation: fadeIn 1s ease;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  margin-top: 40px;
-}
-
-.feature-card {
-  background-color: white;
-  border-radius: 10px;
-  padding: 30px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.feature-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-}
-
-.feature-icon {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-}
-
-.feature-card h3 {
-  color: #1e3a8a;
-  margin-bottom: 15px;
-  font-size: 1.3rem;
-}
-
-.feature-card p {
-  color: #64748b;
-  line-height: 1.6;
-}
-
-.specs-section {
-  margin: 60px 0;
-  animation: fadeIn 1s ease;
-}
-
-/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -206,12 +113,6 @@
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Responsive Styles */
 @media (max-width: 768px) {
   .hero-section {
     min-height: 500px;
@@ -230,14 +131,6 @@
     padding: 12px 30px;
     font-size: 1rem;
   }
-  
-  .section-title {
-    font-size: 1.8rem;
-  }
-  
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 480px) {
@@ -253,103 +146,59 @@
   .hero-text {
     font-size: 1rem;
   }
+}/* src/pages/Home/Home.css */
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
 }
 
-.auto-rotate-toggle {
+.hero-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  min-height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 15px;
+  text-align: center;
+  color: white;
+  overflow: hidden;
+  z-index: 10;
 }
 
-.auto-rotate-toggle label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: #64748b;
-  font-size: 0.9rem;
+.home-page.content-visible .hero-section {
+  position: relative;
+  height: 100vh;
+  min-height: 600px;
 }
 
-.auto-rotate-toggle input {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
 }
 
-.viewer-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 15px;
+/* Rest of your existing hero section styles remain the same */
+
+.viewer-section,
+.features-section {
+  position: relative;
+  z-index: 1;
+  background: white;
+  margin-top: 100vh; /* Push content below the hero section */
 }
 
-/* Add these responsive styles to your existing Home.css */
-
-/* Responsive Grid Layouts */
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
+.home-page.content-visible .viewer-section,
+.home-page.content-visible .features-section {
+  margin-top: 0;
 }
 
-.specs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-/* Responsive Viewer */
-.three-d-viewer {
-  height: 50vh;
-  min-height: 300px;
-}
-
-/* Mobile Styles */
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-  
-  .hero-text {
-    font-size: 1.1rem;
-  }
-  
-  .hero-button {
-    padding: 12px 30px;
-    font-size: 1rem;
-  }
-  
-  .section-title {
-    font-size: 1.8rem;
-  }
-  
-  .viewer-container {
-    padding: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-section {
-    min-height: 400px;
-    height: 70vh;
-  }
-  
-  .hero-title {
-    font-size: 1.8rem;
-  }
-  
-  .hero-text {
-    font-size: 1rem;
-  }
-  
-  .features-grid,
-  .specs-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .three-d-viewer {
-    height: 40vh;
-    min-height: 250px;
-  }
-}
+/* Rest of your existing styles */

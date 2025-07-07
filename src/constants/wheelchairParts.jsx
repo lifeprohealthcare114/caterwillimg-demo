@@ -1,8 +1,10 @@
+// src/constants/wheelchairParts.js
 export const wheelchairParts = [
   {
     id: 'headrest',
     name: 'Headrest',
-    position: { x: 50, y: 15, z: 0 },
+    frontPosition: { x: 38, y: 5},
+    backPosition: null,
     description: 'Adjustable headrest provides comfortable support for the user\'s head and neck during operation.',
     howItWorks: 'The headrest can be adjusted for height and angle to accommodate different user preferences and medical needs.',
     media: {
@@ -20,7 +22,8 @@ export const wheelchairParts = [
   {
     id: 'seat',
     name: 'Seat',
-    position: { x: 50, y: 35, z: 0 },
+    frontPosition: { x: 35, y: 25 },
+    backPosition: null,
     description: 'Fire-resistant cushioned seat with automatic tilt system for optimal positioning during different terrains.',
     howItWorks: 'The seat automatically adjusts its angle during stair climbing to maintain user comfort and safety. It can tilt within a 14-degree range.',
     media: {
@@ -38,7 +41,8 @@ export const wheelchairParts = [
   {
     id: 'remote-controller',
     name: 'Remote Controller',
-    position: { x: 65, y: 45, z: 0 },
+    frontPosition: { x: 43, y: 37},
+    backPosition: null,
     description: 'Advanced control system with joystick and LCD display for operating the wheelchair.',
     howItWorks: 'Features customizable sensitivity settings, speed control, mode selection (wheels/tracks), and displays battery status and error codes.',
     media: {
@@ -57,7 +61,8 @@ export const wheelchairParts = [
   {
     id: 'armrest',
     name: 'Armrest',
-    position: { x: 35, y: 40, z: 0 },
+    frontPosition: null,
+    backPosition:  null,
     description: 'Adjustable armrests for user comfort and support.',
     howItWorks: 'Height adjustable from 150-300mm to accommodate different user needs and preferences.',
     media: {
@@ -75,7 +80,8 @@ export const wheelchairParts = [
   {
     id: 'legrest',
     name: 'Legrest/Footrest',
-    position: { x: 50, y: 70, z: 0 },
+    frontPosition: { x: 60, y: 60 },
+    backPosition: null,
     description: 'Adjustable leg support with footrest platform.',
     howItWorks: 'Length adjustable from 380-540mm. Can be adjusted mechanically or electrically depending on model.',
     media: {
@@ -93,7 +99,8 @@ export const wheelchairParts = [
   {
     id: 'drive-wheels',
     name: 'Drive Wheels',
-    position: { x: 25, y: 55, z: 0 },
+    frontPosition: { x: 35, y: 70 },
+    backPosition: { x: 75, y: 75 },
     description: 'Large 320-355mm drive wheels for smooth movement on flat surfaces.',
     howItWorks: 'Powered by 24V motors, these wheels provide movement up to 7-8 km/h on flat terrain with 18-25km range.',
     media: {
@@ -111,7 +118,8 @@ export const wheelchairParts = [
   {
     id: 'track-system',
     name: 'Track Platform',
-    position: { x: 50, y: 85, z: 0 },
+    frontPosition: { x: 60, y: 88 },
+    backPosition: null,
     description: 'Revolutionary track system for climbing stairs and obstacles.',
     howItWorks: 'Activates via control panel to deploy tracks that can climb stairs up to 35° angle and steps up to 180mm high.',
     media: {
@@ -130,7 +138,8 @@ export const wheelchairParts = [
   {
     id: 'battery',
     name: 'Battery Module',
-    position: { x: 75, y: 65, z: 0 },
+    frontPosition: null,
+    backPosition: { x: 50, y: 75 },
     description: 'High-capacity AGM or Lithium battery system.',
     howItWorks: '33-42 A*h capacity batteries charged with included 220V charger. Features automatic monitoring and safety systems.',
     media: {
@@ -149,7 +158,8 @@ export const wheelchairParts = [
   {
     id: 'safety-handle',
     name: 'Safety Handle',
-    position: { x: 50, y: 25, z: 0 },
+   frontPosition: null,
+    backPosition: { x: 52, y: 35 },
     description: 'Special handles for safe transport and assistance.',
     howItWorks: 'Reinforced handles designed specifically for lifting and maneuvering the wheelchair safely.',
     media: {
@@ -167,7 +177,8 @@ export const wheelchairParts = [
   {
     id: 'backrest',
     name: 'Backrest',
-    position: { x: 50, y: 20, z: 0 },
+    frontPosition: null,
+    backPosition: null,
     description: 'Ergonomic back support with adjustable recline feature.',
     howItWorks: 'Can be adjusted to multiple angles for optimal comfort and support during different activities.',
     media: {
@@ -184,7 +195,8 @@ export const wheelchairParts = [
   {
     id: 'footplate',
     name: 'Footplate',
-    position: { x: 50, y: 75, z: 0 },
+    frontPosition: { x: 70, y: 75 },
+    backPosition: null,
     description: 'Adjustable foot support platform.',
     howItWorks: 'Can be raised, lowered, and angled to accommodate different leg lengths and positions.',
     media: {
@@ -202,7 +214,8 @@ export const wheelchairParts = [
   {
     id: 'control-panel',
     name: 'Control Panel',
-    position: { x: 60, y: 40, z: 0 },
+   frontPosition: null,
+    backPosition: null,
     description: 'User interface for wheelchair operation.',
     howItWorks: 'Includes joystick for movement control, mode selection buttons, and status indicators.',
     media: {

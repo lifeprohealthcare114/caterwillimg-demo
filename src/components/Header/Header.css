@@ -1,3 +1,4 @@
+/* src/components/Header/Header.css */
 .header {
   background-color: #1e3a8a;
   color: white;
@@ -69,7 +70,6 @@
   cursor: pointer;
 }
 
-/* Responsive Styles */
 @media (max-width: 768px) {
   .mobile-menu-button {
     display: block;
