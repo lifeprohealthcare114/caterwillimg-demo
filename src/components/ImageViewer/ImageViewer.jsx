@@ -1,9 +1,20 @@
-// src/components/ImageViewer/ImageViewer.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './ImageViewer.css';
 
 const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const [currentView, setCurrentView] = useState('front');
+  const [isZooming, setIsZooming] = useState(false);
+
+  useEffect(() => {
+    // Trigger zoom effect every 8 seconds
+    const interval = setInterval(() => {
+      setIsZooming(true);
+      setTimeout(() => setIsZooming(false), 6000); // Active zoom duration
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handlePartClick = (part) => {
     if (!isModalOpen) {
@@ -29,21 +40,35 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
       </div>
       
       <div className="wheelchair-image-container">
-        <img 
-          src={currentView === 'front' 
-            ? "/assets/images/front.jpg" 
-            : "/assets/images/back.jpg"} 
-          alt={`Wheelchair ${currentView} view`}
-          className="wheelchair-image"
-        />
+        <TransitionGroup component={null}>
+          <CSSTransition
+            key={currentView}
+            timeout={400}
+            classNames="image"
+            nodeRef={React.useRef()}
+          >
+            <div className={`image-wrapper ${isZooming ? 'zooming' : ''}`}>
+              <img 
+                src={currentView === 'front' 
+                  ? "/assets/images/front.jpg" 
+                  : "/assets/images/back.jpg"} 
+                alt={`Wheelchair ${currentView} view`}
+                className="wheelchair-image"
+                onError={(e) => {
+                  e.target.onerror = null; 
+                  e.target.src = "/assets/images/placeholder.jpg";
+                }}
+                ref={React.useRef()}
+              />
+            </div>
+          </CSSTransition>
+        </TransitionGroup>
         
         {parts.map((part) => {
-          // Use frontPosition for front view, backPosition for back view
           const position = currentView === 'front' 
             ? part.frontPosition 
             : part.backPosition;
           
-          // Only show hotspot if position exists for this view
           if (!position) return null;
 
           return (

@@ -3,7 +3,7 @@ export const wheelchairParts = [
   {
     id: 'headrest',
     name: 'Headrest',
-    frontPosition: { x: 38, y: 5},
+    frontPosition: { x: 38, y: 7},
     backPosition: null,
     description: 'Adjustable headrest provides comfortable support for the user\'s head and neck during operation.',
     howItWorks: 'The headrest can be adjusted for height and angle to accommodate different user preferences and medical needs.',
