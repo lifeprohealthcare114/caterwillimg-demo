@@ -8,7 +8,7 @@
 .hero-section {
   position: relative;
   height: 100vh;
-  min-height: 600px;
+  min-height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,10 +29,10 @@
 
 .video-background {
   position: absolute;
-  top: 50%;
+  top: 58%;
   left: 50%;
   width: 100%;
-  height: 84%;
+  height: 100%;
   object-fit: cover;
   transform: translate(-50%, -50%);
   z-index: 1;
@@ -200,5 +200,153 @@
 .home-page.content-visible .features-section {
   margin-top: 0;
 }
+/* src/pages/Home/Home.css */
+.home-page {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
 
-/* Rest of your existing styles */
+.hero-section {
+  position: center;
+  height: 100vh;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  overflow: hidden;
+}
+
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Optimized video background */
+.video-background {
+  position: absolute;
+  top: 56%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  transition: transform 0.5s ease;
+}
+
+/* Performance optimization for mobile devices */
+@media (max-width: 768px) {
+  .video-background {
+    /* Reduce quality for mobile to improve performance */
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* Overlay improvements */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, 
+              rgba(0,0,0,0.2) 0%, 
+              rgba(0,0,0,0.5) 50%,
+              rgba(0,0,0,0.7) 100%);
+  z-index: 2;
+}
+
+/* Content positioning */
+.hero-content {
+  position: relative;
+  z-index: 3;
+  width: 90%;
+  max-width: 800px;
+  padding: 20px;
+  transform: translateY(0);
+  transition: transform 0.5s ease;
+}
+
+/* Typography adjustments */
+.hero-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  animation: fadeInUp 1s ease;
+  line-height: 1.2;
+}
+
+.hero-text {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  animation: fadeInUp 1s ease 0.2s both;
+}
+
+.hero-button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: clamp(0.8rem, 2vw, 1rem) clamp(2rem, 4vw, 2.5rem);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: none;
+  animation: fadeInUp 1s ease 0.4s both;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 400px;
+  }
+  
+  .video-background {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  
+  .overlay {
+    background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.3) 0%, 
+                rgba(0,0,0,0.6) 100%);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    min-height: 350px;
+  }
+  
+  .hero-content {
+    padding: 10px;
+  }
+  
+  .hero-button {
+    width: 90%;
+    max-width: 250px;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

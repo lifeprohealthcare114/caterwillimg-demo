@@ -3,7 +3,7 @@ export const wheelchairParts = [
   {
     id: 'headrest',
     name: 'Headrest',
-    frontPosition: { x: 38, y: 7},
+    frontPosition: { x: 38, y:6},
     backPosition: null,
     description: 'Adjustable headrest provides comfortable support for the user\'s head and neck during operation.',
     howItWorks: 'The headrest can be adjusted for height and angle to accommodate different user preferences and medical needs.',
@@ -80,7 +80,7 @@ export const wheelchairParts = [
   {
     id: 'legrest',
     name: 'Legrest/Footrest',
-    frontPosition: { x: 60, y: 60 },
+    frontPosition: { x: 65, y: 60 },
     backPosition: null,
     description: 'Adjustable leg support with footrest platform.',
     howItWorks: 'Length adjustable from 380-540mm. Can be adjusted mechanically or electrically depending on model.',
@@ -100,7 +100,7 @@ export const wheelchairParts = [
     id: 'drive-wheels',
     name: 'Drive Wheels',
     frontPosition: { x: 35, y: 70 },
-    backPosition: { x: 75, y: 75 },
+    backPosition: { x: 74, y: 70 },
     description: 'Large 320-355mm drive wheels for smooth movement on flat surfaces.',
     howItWorks: 'Powered by 24V motors, these wheels provide movement up to 7-8 km/h on flat terrain with 18-25km range.',
     media: {
@@ -118,7 +118,7 @@ export const wheelchairParts = [
   {
     id: 'track-system',
     name: 'Track Platform',
-    frontPosition: { x: 60, y: 88 },
+    frontPosition: { x: 60, y: 92 },
     backPosition: null,
     description: 'Revolutionary track system for climbing stairs and obstacles.',
     howItWorks: 'Activates via control panel to deploy tracks that can climb stairs up to 35° angle and steps up to 180mm high.',
@@ -139,7 +139,7 @@ export const wheelchairParts = [
     id: 'battery',
     name: 'Battery Module',
     frontPosition: null,
-    backPosition: { x: 50, y: 75 },
+    backPosition: { x: 50, y: 82 },
     description: 'High-capacity AGM or Lithium battery system.',
     howItWorks: '33-42 A*h capacity batteries charged with included 220V charger. Features automatic monitoring and safety systems.',
     media: {
@@ -195,7 +195,7 @@ export const wheelchairParts = [
   {
     id: 'footplate',
     name: 'Footplate',
-    frontPosition: { x: 70, y: 75 },
+    frontPosition: { x: 70, y: 77 },
     backPosition: null,
     description: 'Adjustable foot support platform.',
     howItWorks: 'Can be raised, lowered, and angled to accommodate different leg lengths and positions.',

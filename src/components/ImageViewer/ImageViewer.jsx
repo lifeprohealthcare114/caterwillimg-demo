@@ -5,16 +5,33 @@ import './ImageViewer.css';
 const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const [currentView, setCurrentView] = useState('front');
   const [isZooming, setIsZooming] = useState(false);
+  const [rotatingView, setRotatingView] = useState(null);
 
+  // Initial load and zooming setup
   useEffect(() => {
-    // Trigger zoom effect every 8 seconds
+    // Initial rotation on first load
+    setRotatingView(currentView);
+    const initialTimer = setTimeout(() => setRotatingView(null), 1500);
+    
+    // Set up zooming interval
     const interval = setInterval(() => {
       setIsZooming(true);
-      setTimeout(() => setIsZooming(false), 6000); // Active zoom duration
+      setTimeout(() => setIsZooming(false), 6000);
     }, 8000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(initialTimer);
+    };
+  }, [currentView]); // Added currentView to dependency array
+
+  // Handle view changes and rotation
+  useEffect(() => {
+    // Trigger rotation when view changes
+    setRotatingView(currentView);
+    const timer = setTimeout(() => setRotatingView(null), 1500);
+    return () => clearTimeout(timer);
+  }, [currentView]);
 
   const handlePartClick = (part) => {
     if (!isModalOpen) {
@@ -47,7 +64,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
             classNames="image"
             nodeRef={React.useRef()}
           >
-            <div className={`image-wrapper ${isZooming ? 'zooming' : ''}`}>
+            <div className={`image-wrapper ${isZooming ? 'zooming' : ''} ${rotatingView === currentView ? 'initial-rotate' : ''}`}>
               <img 
                 src={currentView === 'front' 
                   ? "/assets/images/front.jpg" 
