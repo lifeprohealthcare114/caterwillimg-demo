@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import PropTypes from 'prop-types';
 import './ImageViewer.css';
 
 const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
@@ -10,16 +11,88 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
+  const [imageDimensions, setImageDimensions] = useState({ 
+    naturalWidth: 0, 
+    naturalHeight: 0,
+    displayedWidth: 0,
+    displayedHeight: 0,
+    containerWidth: 0,
+    containerHeight: 0,
+    offsetX: 0,
+    offsetY: 0,
+    scaleFactor: 1
+  });
   
   const imgContainerRef = useRef(null);
   const imgRef = useRef(null);
+  const currentImgRef = useRef(null);
+  const nodeRef = useRef(null);
+  const hasDimensions = useRef(false);
 
-  // Initial load and zooming setup
+  // Calculate image dimensions and positioning
+  const updateImageDimensions = () => {
+    if (currentImgRef.current && imgContainerRef.current) {
+      const { naturalWidth, naturalHeight } = currentImgRef.current;
+      const containerRect = imgContainerRef.current.getBoundingClientRect();
+      const imageRect = currentImgRef.current.getBoundingClientRect();
+      
+      const containerAspect = containerRect.width / containerRect.height;
+      const imageAspect = naturalWidth / naturalHeight;
+      
+      let scaleFactor, offsetX, offsetY;
+      
+      if (containerAspect > imageAspect) {
+        // Container is wider than image (letterboxing on sides)
+        scaleFactor = containerRect.height / naturalHeight;
+        offsetX = (containerRect.width - (naturalWidth * scaleFactor)) / 2;
+        offsetY = 0;
+      } else {
+        // Container is taller than image (letterboxing top/bottom)
+        scaleFactor = containerRect.width / naturalWidth;
+        offsetX = 0;
+        offsetY = (containerRect.height - (naturalHeight * scaleFactor)) / 2;
+      }
+      
+      setImageDimensions({
+        naturalWidth,
+        naturalHeight,
+        displayedWidth: imageRect.width,
+        displayedHeight: imageRect.height,
+        containerWidth: containerRect.width,
+        containerHeight: containerRect.height,
+        offsetX,
+        offsetY,
+        scaleFactor
+      });
+      hasDimensions.current = true;
+    }
+  };
+
+  // Set up resize observers and event listeners
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(updateImageDimensions);
+    if (imgContainerRef.current) {
+      resizeObserver.observe(imgContainerRef.current);
+    }
+
+    window.addEventListener('resize', updateImageDimensions);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateImageDimensions);
+    };
+  }, [currentView]);
+
+  // Reset dimensions flag when view changes
+  useEffect(() => {
+    hasDimensions.current = false;
+  }, [currentView]);
+
+  // Set up initial animations and zoom effects
   useEffect(() => {
     setRotatingView(currentView);
     const initialTimer = setTimeout(() => setRotatingView(null), 1500);
     
-    // Setup auto-zoom effect only when not manually zoomed
     let interval;
     if (!isZoomed) {
       interval = setInterval(() => {
@@ -33,13 +106,6 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
       clearTimeout(initialTimer);
     };
   }, [currentView, isZoomed]);
-
-  // Handle view changes and rotation
-  useEffect(() => {
-    setRotatingView(currentView);
-    const timer = setTimeout(() => setRotatingView(null), 1500);
-    return () => clearTimeout(timer);
-  }, [currentView]);
 
   const handlePartClick = (part) => {
     if (!isModalOpen) {
@@ -58,8 +124,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const handleImageClick = (e) => {
     if (isModalOpen || fullscreenImage) return;
     
-    if (!isZoomed) {
-      // Calculate click position relative to image
+    if (!isZoomed && imgContainerRef.current) {
       const container = imgContainerRef.current;
       const { left, top, width, height } = container.getBoundingClientRect();
       const x = ((e.clientX - left) / width) * 100;
@@ -67,16 +132,16 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
       
       setZoomPosition({ x, y });
       setIsZoomed(true);
-      setZoomScale(2); // Set zoom scale to 2x
-      setIsZooming(false); // Stop any ongoing auto-zoom
+      setZoomScale(2);
+      setIsZooming(false);
     } else {
       setIsZoomed(false);
-      setZoomScale(1); // Reset zoom scale
+      setZoomScale(1);
     }
   };
 
   const handleMouseMove = (e) => {
-    if (!isZoomed || isModalOpen || fullscreenImage) return;
+    if (!isZoomed || isModalOpen || fullscreenImage || !imgContainerRef.current) return;
     
     const container = imgContainerRef.current;
     const { left, top, width, height } = container.getBoundingClientRect();
@@ -86,17 +151,21 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     setZoomPosition({ x, y });
   };
 
-  // Calculate hotspot position based on zoom
   const calculateHotspotPosition = (position) => {
-    if (!isZoomed) return position;
+    if (!position || !imageDimensions.naturalWidth) return { left: 0, top: 0 };
     
-    // Calculate the offset based on zoom position and scale
-    const offsetX = (position.x - zoomPosition.x) * (zoomScale - 1);
-    const offsetY = (position.y - zoomPosition.y) * (zoomScale - 1);
+    const { x, y } = position;
+    const { offsetX, offsetY, scaleFactor } = imageDimensions;
+    
+    // Calculate position relative to the image (not container)
+    const left = offsetX + (x / 100) * imageDimensions.naturalWidth * scaleFactor;
+    const top = offsetY + (y / 100) * imageDimensions.naturalHeight * scaleFactor;
     
     return {
-      x: position.x + offsetX,
-      y: position.y + offsetY
+      left,
+      top,
+      width: imageDimensions.naturalWidth * scaleFactor,
+      height: imageDimensions.naturalHeight * scaleFactor
     };
   };
 
@@ -171,13 +240,19 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
             <TransitionGroup component={null}>
               <CSSTransition
                 key={currentView}
-                timeout={400}
-                classNames="image"
-                nodeRef={React.useRef()}
+                timeout={500}
+                classNames="image-transition"
+                nodeRef={nodeRef}
               >
-                <div className={`image-wrapper ${!isZoomed && isZooming ? 'zooming' : ''} ${rotatingView === currentView ? 'initial-rotate' : ''}`}>
+                <div 
+                  ref={nodeRef}
+                  className={`image-wrapper ${!isZoomed && isZooming ? 'zooming' : ''} ${rotatingView === currentView ? 'initial-rotate' : ''}`}
+                >
                   <img 
-                    ref={imgRef}
+                    ref={(node) => {
+                      imgRef.current = node;
+                      currentImgRef.current = node;
+                    }}
                     src={currentView === 'front' 
                       ? "/assets/images/front.jpg" 
                       : "/assets/images/back.jpg"} 
@@ -187,43 +262,48 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
                       transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
                       transform: isZoomed ? `scale(${zoomScale})` : 'scale(1)'
                     }}
+                    onLoad={updateImageDimensions}
                     onError={(e) => {
                       e.target.onerror = null; 
                       e.target.src = "/assets/images/placeholder.jpg";
                     }}
                   />
+                  
+                  {/* Hotspots rendered inside the image wrapper */}
+                  {parts.map((part) => {
+                    const position = currentView === 'front' 
+                      ? part.frontPosition 
+                      : part.backPosition;
+                    
+                    if (!position) return null;
+
+                    const { left, top } = calculateHotspotPosition(position);
+
+                    return (
+                      <div 
+                        key={`${part.id}-${currentView}`}
+                        className="hotspot"
+                        style={{
+                          position: 'absolute',
+                          left: `${left}px`,
+                          top: `${top}px`,
+                          transform: 'translate(-50%, -50%)',
+                          transition: 'transform 0.3s ease',
+                          zIndex: 10
+                        }}
+                        onClick={() => handlePartClick(part)}
+                      >
+                        <div className="hotspot-marker"></div>
+                        <div className="hotspot-tooltip">
+                          {part.name}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </CSSTransition>
             </TransitionGroup>
             
-            {parts.map((part) => {
-              const position = currentView === 'front' 
-                ? part.frontPosition 
-                : part.backPosition;
-              
-              if (!position) return null;
-
-              const adjustedPosition = calculateHotspotPosition(position);
-
-              return (
-                <div 
-                  key={part.id}
-                  className="hotspot"
-                  style={{
-                    left: `${adjustedPosition.x}%`,
-                    top: `${adjustedPosition.y}%`,
-                    transform: isZoomed ? `scale(${1/zoomScale})` : 'scale(1)',
-                    transformOrigin: 'center center'
-                  }}
-                  onClick={() => handlePartClick(part)}
-                >
-                  <div className="hotspot-marker"></div>
-                  <div className="hotspot-tooltip">
-                    {part.name}
-                  </div>
-                </div>
-              );
-            })}
             <div className="zoom-instructions">
               {isZoomed ? 'Click to zoom out' : 'Click anywhere to zoom in'}
             </div>
@@ -248,6 +328,29 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
       )}
     </div>
   );
+};
+
+ImageViewer.propTypes = {
+  parts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+      frontPosition: PropTypes.shape({
+        x: PropTypes.number,
+        y: PropTypes.number
+      }),
+      backPosition: PropTypes.shape({
+        x: PropTypes.number,
+        y: PropTypes.number
+      })
+    })
+  ).isRequired,
+  onPartClick: PropTypes.func.isRequired,
+  isModalOpen: PropTypes.bool
+};
+
+ImageViewer.defaultProps = {
+  isModalOpen: false
 };
 
 export default ImageViewer;
