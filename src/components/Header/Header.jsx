@@ -27,6 +27,7 @@ const Header = () => {
             <li className="nav-item">
               <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
                 Products
+                
               </Link>
             </li>
             <li className="nav-item">
