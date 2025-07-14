@@ -22,7 +22,7 @@ const Home = () => {
         <div className="overlay"></div>
         
         <div className="hero-content">
-          <h1 className="hero-title">Caterwil GTS Wheelchair</h1>
+          <h1 className="hero-title">Caterwil GTS-4WD</h1>
           <p className="hero-text">
             Experience revolutionary mobility with our advanced stair-climbing wheelchair technology.
           </p>

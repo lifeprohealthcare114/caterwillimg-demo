@@ -10,7 +10,7 @@ const Header = () => {
     <header className="header">
       <div className="header-container">
         <Link to="/" className="brand">
-          Caterwil GTS Wheelchair Demo
+          Caterwil GTS-4WD
         </Link>
         
         {/* Mobile Menu Button */}
@@ -24,12 +24,12 @@ const Header = () => {
 
         <nav className={`nav ${isMenuOpen ? 'open' : ''}`}>
           <ul className="nav-list">
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
                 Products
                 
               </Link>
-            </li>
+            </li> */}
             <li className="nav-item">
               <Link to="/support" className="nav-link" onClick={() => setIsMenuOpen(false)}>
                 Support
