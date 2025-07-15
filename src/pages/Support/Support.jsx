@@ -27,9 +27,8 @@ const Support = () => {
       <div className="contact-section">
         <h2 className="section-title">Contact Us</h2>
         <ul className="contact-list">
-          <li>Email: support@caterwil.com</li>
-          <li>Phone: +1 (800) 555-1234</li>
-          <li>Address: 123 Mobility Lane, Tech City</li>
+          <li>Email: info@lifeprohealthcare.com</li>
+          <li>Address: Vadodara – 390001, Gujarat, INDIA</li>
         </ul>
       </div>
     </div>

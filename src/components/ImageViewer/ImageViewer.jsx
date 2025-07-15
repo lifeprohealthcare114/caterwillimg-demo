@@ -27,6 +27,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const [initialDistance, setInitialDistance] = useState(null);
   const [initialScale, setInitialScale] = useState(1);
   const [lastTap, setLastTap] = useState(0);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   
   const imgContainerRef = useRef(null);
   const imgRef = useRef(null);
@@ -37,36 +38,41 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const updateImageDimensions = () => {
     if (currentImgRef.current && imgContainerRef.current) {
       const { naturalWidth, naturalHeight } = currentImgRef.current;
-      const containerRect = imgContainerRef.current.getBoundingClientRect();
-      const imageRect = currentImgRef.current.getBoundingClientRect();
       
-      const containerAspect = containerRect.width / containerRect.height;
-      const imageAspect = naturalWidth / naturalHeight;
-      
-      let scaleFactor, offsetX, offsetY;
-      
-      if (containerAspect > imageAspect) {
-        scaleFactor = containerRect.height / naturalHeight;
-        offsetX = (containerRect.width - (naturalWidth * scaleFactor)) / 2;
-        offsetY = 0;
-      } else {
-        scaleFactor = containerRect.width / naturalWidth;
-        offsetX = 0;
-        offsetY = (containerRect.height - (naturalHeight * scaleFactor)) / 2;
+      // Only proceed if we have valid dimensions
+      if (naturalWidth > 0 && naturalHeight > 0) {
+        const containerRect = imgContainerRef.current.getBoundingClientRect();
+        const imageRect = currentImgRef.current.getBoundingClientRect();
+        
+        const containerAspect = containerRect.width / containerRect.height;
+        const imageAspect = naturalWidth / naturalHeight;
+        
+        let scaleFactor, offsetX, offsetY;
+        
+        if (containerAspect > imageAspect) {
+          scaleFactor = containerRect.height / naturalHeight;
+          offsetX = (containerRect.width - (naturalWidth * scaleFactor)) / 2;
+          offsetY = 0;
+        } else {
+          scaleFactor = containerRect.width / naturalWidth;
+          offsetX = 0;
+          offsetY = (containerRect.height - (naturalHeight * scaleFactor)) / 2;
+        }
+        
+        setImageDimensions({
+          naturalWidth,
+          naturalHeight,
+          displayedWidth: imageRect.width,
+          displayedHeight: imageRect.height,
+          containerWidth: containerRect.width,
+          containerHeight: containerRect.height,
+          offsetX,
+          offsetY,
+          scaleFactor
+        });
+        hasDimensions.current = true;
+        setIsImageLoaded(true);
       }
-      
-      setImageDimensions({
-        naturalWidth,
-        naturalHeight,
-        displayedWidth: imageRect.width,
-        displayedHeight: imageRect.height,
-        containerWidth: containerRect.width,
-        containerHeight: containerRect.height,
-        offsetX,
-        offsetY,
-        scaleFactor
-      });
-      hasDimensions.current = true;
     }
   };
 
@@ -86,6 +92,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
 
   useEffect(() => {
     hasDimensions.current = false;
+    setIsImageLoaded(false); // Reset loaded state when view changes
   }, [currentView]);
 
   useEffect(() => {
@@ -122,25 +129,21 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   };
 
   const handleImageClick = (e) => {
-    // Check if the click was on a hotspot
     if (e.target.closest('.hotspot')) {
       return;
     }
 
     if (isModalOpen || fullscreenImage) return;
     
-    // For touch devices, toggle zoom on first tap
     if ('ontouchstart' in window || navigator.maxTouchPoints) {
       setIsZoomed(!isZoomed);
       if (!isZoomed) {
-        // Center the zoom on mobile
         setZoomPosition({ x: 50, y: 50 });
         setZoomScale(2);
       }
       return;
     }
     
-    // Original desktop behavior
     if (!isZoomed && imgContainerRef.current) {
       const container = imgContainerRef.current;
       const { left, top, width, height } = container.getBoundingClientRect();
@@ -174,9 +177,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     const currentTime = new Date().getTime();
     const tapLength = currentTime - lastTap;
     
-    // Double tap detection (300ms threshold)
     if (tapLength < 300 && tapLength > 0) {
-      // Center the zoom on double tap
       setZoomPosition({ x: 50, y: 50 });
       setIsZoomed(!isZoomed);
       if (!isZoomed) {
@@ -188,7 +189,6 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     
     setLastTap(currentTime);
     
-    // Single touch for panning
     if (e.touches.length === 1) {
       setTouchStart({
         x: e.touches[0].clientX,
@@ -208,13 +208,12 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     }
     
     const container = imgContainerRef.current;
-    const {  width, height } = container.getBoundingClientRect();
+    const { width, height } = container.getBoundingClientRect();
     
     const touch = e.touches[0];
     const moveX = touch.clientX - touchStart.x;
     const moveY = touch.clientY - touchStart.y;
     
-    // Calculate new position based on movement
     const newX = Math.max(0, Math.min(100, touchPosition.x - (moveX / width) * 100));
     const newY = Math.max(0, Math.min(100, touchPosition.y - (moveY / height) * 100));
     
@@ -313,6 +312,9 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
+            {!isImageLoaded && (
+              <div className="image-loading"></div>
+            )}
             <TransitionGroup component={null}>
               <CSSTransition
                 key={currentView}
@@ -336,7 +338,9 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
                     className={`wheelchair-image ${isZoomed ? 'zoomed' : ''} ${isZoomed ? 'zoomed-mobile' : ''}`}
                     style={{
                       transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                      transform: isZoomed ? `scale(${zoomScale})` : 'scale(1)'
+                      transform: isZoomed ? `scale(${zoomScale})` : 'scale(1)',
+                      opacity: isImageLoaded ? 1 : 0,
+                      transition: 'opacity 0.3s ease, transform 0.3s ease'
                     }}
                     onLoad={updateImageDimensions}
                     onError={(e) => {
@@ -345,7 +349,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
                     }}
                   />
                   
-                  {!isZoomed && parts.map((part) => {
+                  {!isZoomed && isImageLoaded && parts.map((part) => {
                     const position = currentView === 'front' 
                       ? part.frontPosition 
                       : part.backPosition;

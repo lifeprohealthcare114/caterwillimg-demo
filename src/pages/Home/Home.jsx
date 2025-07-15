@@ -1,10 +1,30 @@
 // src/pages/Home/Home.js
 import { Link } from 'react-router-dom';
+import { useRef } from 'react';
 import './Home.css';
 
 const Home = () => {
+  // const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  // const toggleMusic = () => {
+  //   if (isMusicPlaying) {
+  //     audioRef.current.pause();
+  //   } else {
+  //     audioRef.current.play();
+  //   }
+  //   setIsMusicPlaying(!isMusicPlaying);
+  // };
+
   return (
     <div className="home-page">
+      {/* Hidden audio element */}
+      <audio 
+        ref={audioRef} 
+        src="/assets/audio/background-music.mp3" 
+        loop 
+      />
+      
       <section className="hero-section">
         <div className="video-container">
           <video
@@ -29,6 +49,15 @@ const Home = () => {
           <Link to="/viewer" className="hero-button">
             Explore Wheelchair Features
           </Link>
+          
+          {/* Music control button */}
+          {/* <button 
+            className="music-control"
+            onClick={toggleMusic}
+            aria-label={isMusicPlaying ? 'Pause background music' : 'Play background music'}
+          >
+            {isMusicPlaying ? '🔊' : '🔈'}
+          </button> */}
         </div>
       </section>
     </div>
