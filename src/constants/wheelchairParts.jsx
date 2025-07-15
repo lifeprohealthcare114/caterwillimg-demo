@@ -3,7 +3,7 @@ export const wheelchairParts = [
   {
     id: 'headrest',
     name: 'Headrest',
-    frontPosition: { x: 47, y: 6},
+    frontPosition: { x: 46, y: 5},
     backPosition: null,
     description: 'Adjustable headrest provides comfortable support for the user\'s head and neck during operation.',
     howItWorks: 'The headrest can be adjusted for height and angle to accommodate different user preferences and medical needs.',
@@ -41,7 +41,7 @@ export const wheelchairParts = [
   {
     id: 'remote-controller',
     name: 'Remote Controller',
-    frontPosition: { x: 55, y: 38},
+    frontPosition: { x: 53, y: 38},
     backPosition: null,
     description: 'Advanced control system with joystick and LCD display for operating the wheelchair.',
     howItWorks: 'Features customizable sensitivity settings, speed control, mode selection (wheels/tracks), and displays battery status and error codes.',
@@ -80,7 +80,7 @@ export const wheelchairParts = [
   {
     id: 'legrest',
     name: 'Legrest/Footrest',
-    frontPosition: { x: 70, y: 60 },
+    frontPosition: { x: 79, y: 60 },
     backPosition: null,
     description: 'Adjustable leg support with footrest platform.',
     howItWorks: 'Length adjustable from 380-540mm. Can be adjusted mechanically or electrically depending on model.',
@@ -195,7 +195,7 @@ export const wheelchairParts = [
   {
     id: 'footplate',
     name: 'Footplate',
-    frontPosition: { x: 75, y: 78 },
+    frontPosition: { x: 80, y: 76 },
     backPosition: null,
     description: 'Adjustable foot support platform.',
     howItWorks: 'Can be raised, lowered, and angled to accommodate different leg lengths and positions.',

@@ -29,7 +29,6 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const nodeRef = useRef(null);
   const hasDimensions = useRef(false);
 
-  // Calculate image dimensions and positioning
   const updateImageDimensions = () => {
     if (currentImgRef.current && imgContainerRef.current) {
       const { naturalWidth, naturalHeight } = currentImgRef.current;
@@ -42,12 +41,10 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
       let scaleFactor, offsetX, offsetY;
       
       if (containerAspect > imageAspect) {
-        // Container is wider than image (letterboxing on sides)
         scaleFactor = containerRect.height / naturalHeight;
         offsetX = (containerRect.width - (naturalWidth * scaleFactor)) / 2;
         offsetY = 0;
       } else {
-        // Container is taller than image (letterboxing top/bottom)
         scaleFactor = containerRect.width / naturalWidth;
         offsetX = 0;
         offsetY = (containerRect.height - (naturalHeight * scaleFactor)) / 2;
@@ -68,7 +65,6 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     }
   };
 
-  // Set up resize observers and event listeners
   useEffect(() => {
     const resizeObserver = new ResizeObserver(updateImageDimensions);
     if (imgContainerRef.current) {
@@ -83,12 +79,10 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     };
   }, [currentView]);
 
-  // Reset dimensions flag when view changes
   useEffect(() => {
     hasDimensions.current = false;
   }, [currentView]);
 
-  // Set up initial animations and zoom effects
   useEffect(() => {
     setRotatingView(currentView);
     const initialTimer = setTimeout(() => setRotatingView(null), 1500);
@@ -157,7 +151,6 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     const { x, y } = position;
     const { offsetX, offsetY, scaleFactor } = imageDimensions;
     
-    // Calculate position relative to the image (not container)
     const left = offsetX + (x / 100) * imageDimensions.naturalWidth * scaleFactor;
     const top = offsetY + (y / 100) * imageDimensions.naturalHeight * scaleFactor;
     
@@ -174,38 +167,11 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     { id: 2, src: "/assets/images/Caterwil1.jpg", alt: "Wheelchair accessory 2" },
     { id: 3, src: "/assets/images/Caterwil4.jpg", alt: "Wheelchair accessory 3" },
     { id: 4, src: "/assets/images/Caterwil3.jpg", alt: "Wheelchair accessory 4" },
+    { id: 4, src: "/assets/images/Caterwil5.jpg", alt: "Wheelchair accessory 5" },
   ];
 
   return (
     <div className={`image-viewer-wrapper ${fullscreenImage ? 'fullscreen-modal-open' : ''} ${isModalOpen ? 'modal-active' : ''}`}>
-      {/* External thumbnail column */}
-      <div className="external-thumbnail-column">
-        <h3 className="thumbnail-title">Accessories</h3>
-        <div className="thumbnail-grid">
-          {thumbnails.map((thumbnail) => (
-            <div 
-              key={thumbnail.id} 
-              className="thumbnail-container"
-              onClick={() => handleThumbnailClick(thumbnail.src)}
-            >
-              <img
-                src={thumbnail.src}
-                alt={thumbnail.alt}
-                className="thumbnail-image"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "/assets/images/placeholder-thumbnail.jpg";
-                }}
-              />
-              <div className="thumbnail-overlay">
-                <span className="view-text">View</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Main viewer container */}
       <div className="viewer-container">
         <div className="image-viewer">
           <div className="view-selector">
@@ -269,7 +235,6 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
                     }}
                   />
                   
-                  {/* Hotspots rendered inside the image wrapper */}
                   {parts.map((part) => {
                     const position = currentView === 'front' 
                       ? part.frontPosition 
@@ -304,14 +269,40 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
               </CSSTransition>
             </TransitionGroup>
             
-            <div className="zoom-instructions">
+            {/* <div className="zoom-instructions">
               {isZoomed ? 'Click to zoom out' : 'Click anywhere to zoom in'}
+            </div> */}
+          </div>
+
+          {/* Thumbnail row section */}
+          <div className="thumbnail-row-section">
+            <h3 className="thumbnail-title">Accessories</h3>
+            <div className="thumbnail-row-container">
+              {thumbnails.map((thumbnail) => (
+                <div 
+                  key={thumbnail.id} 
+                  className="thumbnail-item"
+                  onClick={() => handleThumbnailClick(thumbnail.src)}
+                >
+                  <img
+                    src={thumbnail.src}
+                    alt={thumbnail.alt}
+                    className="thumbnail-image"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/assets/images/placeholder-thumbnail.jpg";
+                    }}
+                  />
+                  <div className="thumbnail-overlay">
+                    <span className="view-text">View</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Fullscreen modal */}
       {fullscreenImage && (
         <div className="fullscreen-modal" onClick={closeFullscreen}>
           <div className="fullscreen-content" onClick={(e) => e.stopPropagation()}>
