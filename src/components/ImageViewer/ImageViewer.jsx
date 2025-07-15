@@ -208,7 +208,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     }
     
     const container = imgContainerRef.current;
-    const { left, top, width, height } = container.getBoundingClientRect();
+    const {  width, height } = container.getBoundingClientRect();
     
     const touch = e.touches[0];
     const moveX = touch.clientX - touchStart.x;
