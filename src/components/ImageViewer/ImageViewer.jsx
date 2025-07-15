@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import PropTypes from 'prop-types';
 import './ImageViewer.css';
 
@@ -32,14 +31,12 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const imgContainerRef = useRef(null);
   const imgRef = useRef(null);
   const currentImgRef = useRef(null);
-  const nodeRef = useRef(null);
   const hasDimensions = useRef(false);
 
   const updateImageDimensions = () => {
     if (currentImgRef.current && imgContainerRef.current) {
       const { naturalWidth, naturalHeight } = currentImgRef.current;
       
-      // Only proceed if we have valid dimensions
       if (naturalWidth > 0 && naturalHeight > 0) {
         const containerRect = imgContainerRef.current.getBoundingClientRect();
         const imageRect = currentImgRef.current.getBoundingClientRect();
@@ -92,12 +89,12 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
 
   useEffect(() => {
     hasDimensions.current = false;
-    setIsImageLoaded(false); // Reset loaded state when view changes
+    setIsImageLoaded(false);
   }, [currentView]);
 
   useEffect(() => {
     setRotatingView(currentView);
-    const initialTimer = setTimeout(() => setRotatingView(null), 1500);
+    const initialTimer = setTimeout(() => setRotatingView(null), 200); // 0.2 second rotation
     
     let interval;
     if (!isZoomed) {
@@ -315,73 +312,61 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
             {!isImageLoaded && (
               <div className="image-loading"></div>
             )}
-            <TransitionGroup component={null}>
-              <CSSTransition
-                key={currentView}
-                timeout={500}
-                classNames="image-transition"
-                nodeRef={nodeRef}
-              >
-                <div 
-                  ref={nodeRef}
-                  className={`image-wrapper ${!isZoomed && isZooming ? 'zooming' : ''} ${rotatingView === currentView ? 'initial-rotate' : ''}`}
-                >
-                  <img 
-                    ref={(node) => {
-                      imgRef.current = node;
-                      currentImgRef.current = node;
-                    }}
-                    src={currentView === 'front' 
-                      ? "/assets/images/front.jpg" 
-                      : "/assets/images/back.jpg"} 
-                    alt={`Wheelchair ${currentView} view`}
-                    className={`wheelchair-image ${isZoomed ? 'zoomed' : ''} ${isZoomed ? 'zoomed-mobile' : ''}`}
+            <div className={`image-wrapper ${!isZoomed && isZooming ? 'zooming' : ''} ${rotatingView === currentView ? 'initial-rotate' : ''}`}>
+              <img 
+                ref={(node) => {
+                  imgRef.current = node;
+                  currentImgRef.current = node;
+                }}
+                src={currentView === 'front' 
+                  ? "/assets/images/front.jpg" 
+                  : "/assets/images/back.jpg"} 
+                alt={`Wheelchair ${currentView} view`}
+                className={`wheelchair-image ${isZoomed ? 'zoomed' : ''} ${isZoomed ? 'zoomed-mobile' : ''}`}
+                style={{
+                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                  transform: isZoomed ? `scale(${zoomScale})` : 'scale(1)',
+                  opacity: isImageLoaded ? 1 : 0,
+                  transition: 'opacity 0.3s ease, transform 0.3s ease'
+                }}
+                onLoad={updateImageDimensions}
+                onError={(e) => {
+                  e.target.onerror = null; 
+                  e.target.src = "/assets/images/placeholder.jpg";
+                }}
+              />
+              
+              {!isZoomed && isImageLoaded && parts.map((part) => {
+                const position = currentView === 'front' 
+                  ? part.frontPosition 
+                  : part.backPosition;
+                
+                if (!position) return null;
+
+                const { left, top } = calculateHotspotPosition(position);
+
+                return (
+                  <div 
+                    key={`${part.id}-${currentView}`}
+                    className="hotspot"
                     style={{
-                      transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                      transform: isZoomed ? `scale(${zoomScale})` : 'scale(1)',
-                      opacity: isImageLoaded ? 1 : 0,
-                      transition: 'opacity 0.3s ease, transform 0.3s ease'
+                      position: 'absolute',
+                      left: `${left}px`,
+                      top: `${top}px`,
+                      transform: 'translate(-50%, -50%)',
+                      transition: 'transform 0.3s ease',
+                      zIndex: 10
                     }}
-                    onLoad={updateImageDimensions}
-                    onError={(e) => {
-                      e.target.onerror = null; 
-                      e.target.src = "/assets/images/placeholder.jpg";
-                    }}
-                  />
-                  
-                  {!isZoomed && isImageLoaded && parts.map((part) => {
-                    const position = currentView === 'front' 
-                      ? part.frontPosition 
-                      : part.backPosition;
-                    
-                    if (!position) return null;
-
-                    const { left, top } = calculateHotspotPosition(position);
-
-                    return (
-                      <div 
-                        key={`${part.id}-${currentView}`}
-                        className="hotspot"
-                        style={{
-                          position: 'absolute',
-                          left: `${left}px`,
-                          top: `${top}px`,
-                          transform: 'translate(-50%, -50%)',
-                          transition: 'transform 0.3s ease',
-                          zIndex: 10
-                        }}
-                        onClick={(e) => handlePartClick(part, e)}
-                      >
-                        <div className="hotspot-marker"></div>
-                        <div className="hotspot-tooltip">
-                          {part.name}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CSSTransition>
-            </TransitionGroup>
+                    onClick={(e) => handlePartClick(part, e)}
+                  >
+                    <div className="hotspot-marker"></div>
+                    <div className="hotspot-tooltip">
+                      {part.name}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
             {isZoomed && ('ontouchstart' in window || navigator.maxTouchPoints) && (
               <div className="zoom-instructions">
                 Pinch to zoom, drag to pan, tap to exit

@@ -1,5 +1,5 @@
 // src/pages/Viewer/Viewer.js
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { wheelchairParts, wheelchairFeatures } from '../../constants/wheelchairParts';
 import PartModal from '../../components/PartModal/PartModal';
 import ImageViewer from '../../components/ImageViewer/ImageViewer';
@@ -8,6 +8,9 @@ import './Viewer.css';
 const Viewer = () => {
   const [selectedPart, setSelectedPart] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState('start');
+  const featuresGridRef = useRef(null);
+  const featuresSectionRef = useRef(null);
 
   const handlePartClick = (part) => {
     const completePart = {
@@ -43,6 +46,44 @@ const Viewer = () => {
     setSelectedPart(completePart);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (featuresGridRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = featuresGridRef.current;
+        const tolerance = 10;
+        
+        if (scrollLeft <= tolerance) {
+          setScrollPosition('start');
+        } else if (scrollLeft + clientWidth >= scrollWidth - tolerance) {
+          setScrollPosition('end');
+        } else {
+          setScrollPosition('middle');
+        }
+      }
+    };
+
+    const gridElement = featuresGridRef.current;
+    if (gridElement) {
+      gridElement.addEventListener('scroll', handleScroll);
+      // Initial check
+      handleScroll();
+    }
+
+    return () => {
+      if (gridElement) {
+        gridElement.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
+
+  // Scroll to start when features change (for responsiveness)
+  useEffect(() => {
+    if (featuresGridRef.current) {
+      featuresGridRef.current.scrollLeft = 0;
+      setScrollPosition('start');
+    }
+  }, []);
+
   return (
     <div className="viewer-page">
       <section className="viewer-section">
@@ -60,9 +101,15 @@ const Viewer = () => {
         </div>
       </section>
 
-      <section className="features-section">
+      <section 
+        className={`features-section ${scrollPosition}`} 
+        ref={featuresSectionRef}
+      >
         <h2 className="section-title">Key Features</h2>
-        <div className="features-grid">
+        <div 
+          className="features-grid" 
+          ref={featuresGridRef}
+        >
           {wheelchairFeatures.map((feature, index) => (
             <div key={index} className="feature-card">
               <div className="feature-icon">{feature.icon}</div>

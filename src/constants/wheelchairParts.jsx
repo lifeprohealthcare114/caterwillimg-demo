@@ -9,7 +9,7 @@ export const wheelchairParts = [
     howItWorks: 'The headrest can be adjusted for height and angle to accommodate different user preferences and medical needs.',
     media: {
       type: 'image',
-      src: '/assets/images/headrest.jpg',
+      src: '/assets/images/headrest1.jpg',
       poster: '/assets/images/headrest-poster.jpg'
     },
     icon: '🧑‍🦽',
@@ -105,7 +105,7 @@ export const wheelchairParts = [
     howItWorks: 'Powered by 24V motors, these wheels provide movement up to 7-8 km/h on flat terrain with 18-25km range.',
     media: {
       type: 'image',
-      src: '/assets/images/wheels.jpg',
+      src: '/assets/images/wheels1.jpg',
       poster: '/assets/images/wheels-poster.jpg'
     },
     icon: '🛞',
@@ -201,7 +201,7 @@ export const wheelchairParts = [
     howItWorks: 'Can be raised, lowered, and angled to accommodate different leg lengths and positions.',
     media: {
       type: 'image',
-      src: '/assets/images/footplate.jpg',
+      src: '/assets/images/footplate1.jpg',
       poster: '/assets/images/footplate-poster.jpg'
     },
     icon: '👣',
@@ -220,7 +220,7 @@ export const wheelchairParts = [
     howItWorks: 'Includes joystick for movement control, mode selection buttons, and status indicators.',
     media: {
       type: 'image',
-      src: '/assets/images/control-panel.jpg',
+      src: '/assets/images/controller.jpg',
       poster: '/assets/images/control-panel-poster.jpg'
     },
     icon: '🕹️',

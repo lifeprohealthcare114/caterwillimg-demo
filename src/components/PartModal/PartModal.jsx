@@ -16,6 +16,7 @@ const PartModal = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [showSpecs, setShowSpecs] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const media = part.media || {
     type: 'image',
@@ -26,7 +27,6 @@ const PartModal = ({
   const safePlay = useCallback(() => {
     if (!videoRef.current) return Promise.resolve();
     
-    // Cancel any existing play promise
     if (playPromiseRef.current) {
       playPromiseRef.current.catch(() => {});
     }
@@ -53,7 +53,6 @@ const PartModal = ({
   const safePause = useCallback(() => {
     if (!videoRef.current) return;
     
-    // Cancel any pending play promise
     if (playPromiseRef.current) {
       playPromiseRef.current.catch(() => {});
       playPromiseRef.current = null;
@@ -76,9 +75,9 @@ const PartModal = ({
   }, [isPlaying, safePlay, safePause]);
 
   const navigateParts = useCallback(async (direction) => {
-    // Pause current video before navigating
     if (videoRef.current && media.type === 'video') {
       await safePause();
+      setIsLoading(true);
     }
     
     let newIndex = currentPartIndex + direction;
@@ -89,7 +88,6 @@ const PartModal = ({
     setUserInteracted(false);
   }, [currentPartIndex, parts, setSelectedPart, media.type, safePause]);
 
-  // Video initialization and autoplay handling
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement || media.type !== 'video') return;
@@ -98,23 +96,24 @@ const PartModal = ({
     videoElement.playsInline = true;
     videoElement.preload = 'auto';
 
-    let timeoutId;
-
-    const attemptAutoplay = async () => {
+    const handleLoadedData = () => {
+      setIsLoading(false);
       if (!userInteracted) {
-        try {
-          await safePlay();
-        } catch (error) {
-          console.log('Autoplay attempt failed (normal for some browsers):', error);
-        }
+        safePlay().catch(() => {});
       }
     };
 
-    // Only attempt autoplay if user hasn't interacted
-    timeoutId = setTimeout(attemptAutoplay, 300);
+    videoElement.addEventListener('loadeddata', handleLoadedData);
+    
+    let timeoutId = setTimeout(() => {
+      if (videoElement.readyState < 3) {
+        setIsLoading(true);
+      }
+    }, 300);
 
     return () => {
       clearTimeout(timeoutId);
+      videoElement.removeEventListener('loadeddata', handleLoadedData);
       if (playPromiseRef.current) {
         playPromiseRef.current.catch(() => {});
         playPromiseRef.current = null;
@@ -179,12 +178,6 @@ const PartModal = ({
                 <Info size={18} />
                 <span>{showSpecs ? 'Hide' : 'Show'} Specs</span>
               </button>
-              {part.safetyNote && (
-                <div className="safety-note">
-                  <AlertTriangle size={16} />
-                  <span>Safety Note</span>
-                </div>
-              )}
             </div>
           </div>
           
@@ -201,9 +194,22 @@ const PartModal = ({
         </div>
         
         <div className="modal-body">
-          <div className="media-container">
+          <div className={`media-container ${!part.safetyNote ? 'no-safety-note' : ''}`}>
             {media.type === 'video' ? (
               <div className="video-wrapper">
+                {isLoading && (
+                  <div className="video-loader">
+                    <div className="loader-chair">
+                      <div className="seat"></div>
+                      <div className="back"></div>
+                      <div className="leg front-left"></div>
+                      <div className="leg front-right"></div>
+                      <div className="leg back-left"></div>
+                      <div className="leg back-right"></div>
+                    </div>
+                    <p>Loading video...</p>
+                  </div>
+                )}
                 <video
                   ref={videoRef}
                   controls={false}
@@ -211,14 +217,14 @@ const PartModal = ({
                   playsInline
                   loop
                   poster={media.poster}
-                  className="part-media"
+                  className={`part-media ${isLoading ? 'loading' : ''}`}
                   onClick={togglePlayback}
                 >
                   <source src={media.src} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
                 <button 
-                  className={`play-button ${isPlaying ? 'playing' : ''}`}
+                  className={`play-button ${isPlaying ? 'playing' : ''} ${isLoading ? 'hidden' : ''}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     togglePlayback();
@@ -236,6 +242,16 @@ const PartModal = ({
                   e.target.src = '/assets/images/placeholder-part.jpg';
                 }}
               />
+            )}
+            
+            {part.safetyNote && (
+              <div className="safety-section">
+                <h3 className="detail-title">
+                  <AlertTriangle size={18} />
+                  Safety Information
+                </h3>
+                <p className="detail-text">{part.safetyNote}</p>
+              </div>
             )}
           </div>
           
@@ -262,16 +278,6 @@ const PartModal = ({
               <h3 className="detail-title">How It Works</h3>
               <p className="detail-text">{part.howItWorks}</p>
             </div>
-            
-            {part.safetyNote && (
-              <div className="safety-section">
-                <h3 className="detail-title">
-                  <AlertTriangle size={18} />
-                  Safety Information
-                </h3>
-                <p className="detail-text">{part.safetyNote}</p>
-              </div>
-            )}
           </div>
         </div>
         
@@ -288,4 +294,4 @@ const PartModal = ({
   );
 };
 
-export default PartModal;
+export default PartModal; 

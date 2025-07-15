@@ -1,20 +1,18 @@
 // src/pages/Home/Home.js
 import { Link } from 'react-router-dom';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import './Home.css';
 
 const Home = () => {
-  // const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const audioRef = useRef(null);
 
-  // const toggleMusic = () => {
-  //   if (isMusicPlaying) {
-  //     audioRef.current.pause();
-  //   } else {
-  //     audioRef.current.play();
-  //   }
-  //   setIsMusicPlaying(!isMusicPlaying);
-  // };
+  // Prevent scrolling on mount and enable on unmount
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'visible';
+    };
+  }, []);
 
   return (
     <div className="home-page">
@@ -49,15 +47,6 @@ const Home = () => {
           <Link to="/viewer" className="hero-button">
             Explore Wheelchair Features
           </Link>
-          
-          {/* Music control button */}
-          {/* <button 
-            className="music-control"
-            onClick={toggleMusic}
-            aria-label={isMusicPlaying ? 'Pause background music' : 'Play background music'}
-          >
-            {isMusicPlaying ? '🔊' : '🔈'}
-          </button> */}
         </div>
       </section>
     </div>
