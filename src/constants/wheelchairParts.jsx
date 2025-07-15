@@ -100,7 +100,7 @@ export const wheelchairParts = [
     id: 'drive-wheels',
     name: 'Drive Wheels',
     frontPosition: { x: 47, y: 69 },
-    backPosition: { x: 80, y: 70 },
+    backPosition: { x: 82, y: 71 },
     description: 'Large 320-355mm drive wheels for smooth movement on flat surfaces.',
     howItWorks: 'Powered by 24V motors, these wheels provide movement up to 7-8 km/h on flat terrain with 18-25km range.',
     media: {

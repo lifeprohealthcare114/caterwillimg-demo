@@ -247,11 +247,11 @@
 
 .close-button {
   position: absolute;
-  top: -40px;
-  right: 0;
+  top: 2px;
+  right: 9px;
   background: none;
   border: none;
-  color: white;
+  color: #3b82f6;
   font-size: 2.5rem;
   cursor: pointer;
   transition: transform 0.2s ease;
@@ -373,5 +373,73 @@
   .hotspot-marker {
     width: 14px;
     height: 14px;
+  }
+}/* Add these styles to your ImageViewer.css file */
+
+.modal-active .modal-content {
+  position: relative;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 80%;
+  max-height: 80vh;
+  overflow: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-active .modal-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  z-index: 1001;
+}
+
+.modal-active .modal-close-button:hover {
+  color: #333;
+}
+/* Mobile Zoom Styles */
+.wheelchair-image-container.zoomed-mobile {
+  overflow: hidden;
+  cursor: grab;
+}
+
+.wheelchair-image.zoomed-mobile {
+  position: absolute;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  touch-action: none;
+}
+
+.zoom-instructions {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  .wheelchair-image-container {
+    cursor: pointer;
+    touch-action: none;
+  }
+  
+  .wheelchair-image.zoomed {
+    cursor: pointer;
+    touch-action: none;
   }
 }

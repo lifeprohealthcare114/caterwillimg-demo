@@ -22,6 +22,11 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     offsetY: 0,
     scaleFactor: 1
   });
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchPosition, setTouchPosition] = useState({ x: 0, y: 0 });
+  const [initialDistance, setInitialDistance] = useState(null);
+  const [initialScale, setInitialScale] = useState(1);
+  const [lastTap, setLastTap] = useState(0);
   
   const imgContainerRef = useRef(null);
   const imgRef = useRef(null);
@@ -101,7 +106,8 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     };
   }, [currentView, isZoomed]);
 
-  const handlePartClick = (part) => {
+  const handlePartClick = (part, e) => {
+    e.stopPropagation();
     if (!isModalOpen) {
       onPartClick(part);
     }
@@ -116,8 +122,25 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   };
 
   const handleImageClick = (e) => {
+    // Check if the click was on a hotspot
+    if (e.target.closest('.hotspot')) {
+      return;
+    }
+
     if (isModalOpen || fullscreenImage) return;
     
+    // For touch devices, toggle zoom on first tap
+    if ('ontouchstart' in window || navigator.maxTouchPoints) {
+      setIsZoomed(!isZoomed);
+      if (!isZoomed) {
+        // Center the zoom on mobile
+        setZoomPosition({ x: 50, y: 50 });
+        setZoomScale(2);
+      }
+      return;
+    }
+    
+    // Original desktop behavior
     if (!isZoomed && imgContainerRef.current) {
       const container = imgContainerRef.current;
       const { left, top, width, height } = container.getBoundingClientRect();
@@ -145,6 +168,90 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     setZoomPosition({ x, y });
   };
 
+  const handleTouchStart = (e) => {
+    if (!isZoomed || isModalOpen || fullscreenImage) return;
+    
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    
+    // Double tap detection (300ms threshold)
+    if (tapLength < 300 && tapLength > 0) {
+      // Center the zoom on double tap
+      setZoomPosition({ x: 50, y: 50 });
+      setIsZoomed(!isZoomed);
+      if (!isZoomed) {
+        setZoomScale(2);
+      }
+      e.preventDefault();
+      return;
+    }
+    
+    setLastTap(currentTime);
+    
+    // Single touch for panning
+    if (e.touches.length === 1) {
+      setTouchStart({
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      });
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isZoomed || isModalOpen || fullscreenImage || !touchStart || !imgContainerRef.current) return;
+    
+    e.preventDefault();
+    
+    if (e.touches.length === 2) {
+      handlePinch(e);
+      return;
+    }
+    
+    const container = imgContainerRef.current;
+    const { left, top, width, height } = container.getBoundingClientRect();
+    
+    const touch = e.touches[0];
+    const moveX = touch.clientX - touchStart.x;
+    const moveY = touch.clientY - touchStart.y;
+    
+    // Calculate new position based on movement
+    const newX = Math.max(0, Math.min(100, touchPosition.x - (moveX / width) * 100));
+    const newY = Math.max(0, Math.min(100, touchPosition.y - (moveY / height) * 100));
+    
+    setZoomPosition({ x: newX, y: newY });
+    setTouchPosition({ x: newX, y: newY });
+    setTouchStart({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handlePinch = (e) => {
+    if (!isZoomed || isModalOpen || fullscreenImage || e.touches.length < 2) return;
+    
+    e.preventDefault();
+    
+    const touch1 = e.touches[0];
+    const touch2 = e.touches[1];
+    
+    const currentDistance = Math.hypot(
+      touch2.clientX - touch1.clientX,
+      touch2.clientY - touch1.clientY
+    );
+    
+    if (initialDistance === null) {
+      setInitialDistance(currentDistance);
+      setInitialScale(zoomScale);
+      return;
+    }
+    
+    const scale = Math.min(Math.max(1, initialScale * (currentDistance / initialDistance)), 3);
+    setZoomScale(scale);
+  };
+
+  const handleTouchEnd = () => {
+    setTouchStart(null);
+    setTouchPosition(zoomPosition);
+    setInitialDistance(null);
+  };
+
   const calculateHotspotPosition = (position) => {
     if (!position || !imageDimensions.naturalWidth) return { left: 0, top: 0 };
     
@@ -167,7 +274,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     { id: 2, src: "/assets/images/Caterwil1.jpg", alt: "Wheelchair accessory 2" },
     { id: 3, src: "/assets/images/Caterwil4.jpg", alt: "Wheelchair accessory 3" },
     { id: 4, src: "/assets/images/Caterwil3.jpg", alt: "Wheelchair accessory 4" },
-    { id: 4, src: "/assets/images/Caterwil5.jpg", alt: "Wheelchair accessory 5" },
+    { id: 5, src: "/assets/images/Caterwil5.jpg", alt: "Wheelchair accessory 5" },
   ];
 
   return (
@@ -199,9 +306,12 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
           
           <div 
             ref={imgContainerRef}
-            className="wheelchair-image-container"
+            className={`wheelchair-image-container ${isZoomed ? 'zoomed-mobile' : ''}`}
             onClick={handleImageClick}
             onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <TransitionGroup component={null}>
               <CSSTransition
@@ -223,7 +333,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
                       ? "/assets/images/front.jpg" 
                       : "/assets/images/back.jpg"} 
                     alt={`Wheelchair ${currentView} view`}
-                    className={`wheelchair-image ${isZoomed ? 'zoomed' : ''}`}
+                    className={`wheelchair-image ${isZoomed ? 'zoomed' : ''} ${isZoomed ? 'zoomed-mobile' : ''}`}
                     style={{
                       transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
                       transform: isZoomed ? `scale(${zoomScale})` : 'scale(1)'
@@ -235,7 +345,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
                     }}
                   />
                   
-                  {parts.map((part) => {
+                  {!isZoomed && parts.map((part) => {
                     const position = currentView === 'front' 
                       ? part.frontPosition 
                       : part.backPosition;
@@ -256,7 +366,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
                           transition: 'transform 0.3s ease',
                           zIndex: 10
                         }}
-                        onClick={() => handlePartClick(part)}
+                        onClick={(e) => handlePartClick(part, e)}
                       >
                         <div className="hotspot-marker"></div>
                         <div className="hotspot-tooltip">
@@ -268,13 +378,13 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
                 </div>
               </CSSTransition>
             </TransitionGroup>
-            
-            {/* <div className="zoom-instructions">
-              {isZoomed ? 'Click to zoom out' : 'Click anywhere to zoom in'}
-            </div> */}
+            {isZoomed && ('ontouchstart' in window || navigator.maxTouchPoints) && (
+              <div className="zoom-instructions">
+                Pinch to zoom, drag to pan, tap to exit
+              </div>
+            )}
           </div>
 
-          {/* Thumbnail row section */}
           <div className="thumbnail-row-section">
             <h3 className="thumbnail-title">Accessories</h3>
             <div className="thumbnail-row-container">
@@ -326,6 +436,7 @@ ImageViewer.propTypes = {
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       name: PropTypes.string.isRequired,
+      description: PropTypes.string,
       frontPosition: PropTypes.shape({
         x: PropTypes.number,
         y: PropTypes.number
