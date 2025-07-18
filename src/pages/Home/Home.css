@@ -73,6 +73,7 @@
   padding: 20px;
   transform: translateY(0);
   transition: transform 0.5s ease;
+  margin-bottom: 10vh; /* Changed from absolute positioning to margin-bottom */
 }
 
 .hero-title {
@@ -116,7 +117,7 @@
 @media (max-width: 1024px) {
   .hero-section {
     align-items: flex-end;
-    padding-bottom: 20vh;
+    padding-bottom: 10vh; /* Reduced from 20vh to 10vh */
   }
 
   .video-background {
@@ -132,19 +133,20 @@
   .hero-content {
     width: 100%;
     padding: 20px;
-    padding-bottom: 5vh;
+    padding-bottom: 0vh;
     transform: none;
-    position: absolute;
-    bottom: 0;
+    position: relative; /* Changed from absolute to relative */
+    bottom: auto;
+    margin-bottom: -1vh; /* Added margin-bottom */
   }
 
   .hero-title {
     margin-bottom: 1rem;
-    font-size: 2rem;
+    font-size: 4rem;
   }
 
   .hero-text {
-    font-size: 1.1rem;
+    font-size: 1.7rem;
     margin-bottom: 1.5rem;
   }
 
@@ -157,7 +159,7 @@
 /* Portrait mode on mobile */
 @media (max-width: 768px) and (orientation: portrait) {
   .hero-section {
-    padding-bottom: 15vh;
+    padding-bottom: 10vh; /* Reduced from 15vh to 10vh */
   }
 
   .video-container {
@@ -167,6 +169,7 @@
 
   .hero-content {
     padding-bottom: 3vh;
+    margin-bottom: 4vh; /* Added margin-bottom */
   }
 }
 
@@ -178,7 +181,7 @@
   }
 
   .hero-section {
-    padding-bottom: 10vh;
+    padding-bottom: 10vh; /* Reduced from 10vh to 5vh */
   }
 
   .video-container {
@@ -191,7 +194,7 @@
 @media (max-width: 480px) {
   .hero-section {
     min-height: 400px;
-    padding-bottom: 12vh;
+    padding-bottom: 10vh; /* Reduced from 12vh to 10vh */
   }
 
   .video-container {
@@ -201,7 +204,8 @@
 
   .hero-content {
     padding: 15px;
-    padding-bottom: 2vh;
+    padding-bottom: 0vh;
+    margin-bottom: 8vh; /* Added margin-bottom */
   }
 
   .hero-title {

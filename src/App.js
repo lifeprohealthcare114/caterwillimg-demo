@@ -1,10 +1,9 @@
-// src/App.js
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Home from './pages/Home/Home';
 import Viewer from './pages/Viewer/Viewer';
 import Support from './pages/Support/Support';
+import AudioPlayer from './components/AudioPlayer/AudioPlayer';
 import './App.css';
 
 function App() {
@@ -19,6 +18,7 @@ function App() {
             <Route path="/support" element={<Support />} />
           </Routes>
         </main>
+        <AudioPlayer />
       </div>
     </Router>
   );

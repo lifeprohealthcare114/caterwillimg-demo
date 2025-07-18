@@ -259,7 +259,9 @@
 .specs-toggle:hover {
   background-color: #f1f5f9;
 }
-
+.specs-section{
+  padding-left: 31px;
+}
 .specs-list {
   padding-left: 20px;
   margin-top: 8px;

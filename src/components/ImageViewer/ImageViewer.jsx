@@ -27,11 +27,22 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   const [initialScale, setInitialScale] = useState(1);
   const [lastTap, setLastTap] = useState(0);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [currentFullscreenIndex, setCurrentFullscreenIndex] = useState(0);
   
   const imgContainerRef = useRef(null);
   const imgRef = useRef(null);
   const currentImgRef = useRef(null);
+  const fullscreenImageRef = useRef(null);
   const hasDimensions = useRef(false);
+
+  const thumbnails = [
+    { id: 1, src: "/assets/images/Caterwil2.jpg", alt: "Wheelchair accessory 1" },
+    { id: 2, src: "/assets/images/Caterwil1.jpg", alt: "Wheelchair accessory 2" },
+    { id: 3, src: "/assets/images/Caterwil4.jpg", alt: "Wheelchair accessory 3" },
+    { id: 4, src: "/assets/images/Caterwil3.jpg", alt: "Wheelchair accessory 4" },
+    { id: 5, src: "/assets/images/Caterwil5.jpg", alt: "Wheelchair accessory 5" },
+  ];
 
   const updateImageDimensions = () => {
     if (currentImgRef.current && imgContainerRef.current) {
@@ -94,7 +105,7 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
 
   useEffect(() => {
     setRotatingView(currentView);
-    const initialTimer = setTimeout(() => setRotatingView(null), 200); // 0.2 second rotation
+    const initialTimer = setTimeout(() => setRotatingView(null), 200);
     
     let interval;
     if (!isZoomed) {
@@ -118,11 +129,47 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
   };
 
   const handleThumbnailClick = (imageSrc) => {
+    const index = thumbnails.findIndex(thumb => thumb.src === imageSrc);
+    setCurrentFullscreenIndex(index >= 0 ? index : 0);
     setFullscreenImage(imageSrc);
   };
 
   const closeFullscreen = () => {
     setFullscreenImage(null);
+  };
+
+  const navigateFullscreen = (direction) => {
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = (currentFullscreenIndex - 1 + thumbnails.length) % thumbnails.length;
+    } else {
+      newIndex = (currentFullscreenIndex + 1) % thumbnails.length;
+    }
+    setCurrentFullscreenIndex(newIndex);
+    setFullscreenImage(thumbnails[newIndex].src);
+  };
+
+  const handleFullscreenTouchStart = (e) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleFullscreenTouchMove = (e) => {
+    if (!touchStartX) return;
+    const touchEndX = e.touches[0].clientX;
+    const difference = touchStartX - touchEndX;
+    
+    if (Math.abs(difference) > 50) {
+      if (difference > 0) {
+        navigateFullscreen('next');
+      } else {
+        navigateFullscreen('prev');
+      }
+      setTouchStartX(null);
+    }
+  };
+
+  const handleFullscreenTouchEnd = () => {
+    setTouchStartX(null);
   };
 
   const handleImageClick = (e) => {
@@ -265,14 +312,6 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
     };
   };
 
-  const thumbnails = [
-    { id: 1, src: "/assets/images/Caterwil2.jpg", alt: "Wheelchair accessory 1" },
-    { id: 2, src: "/assets/images/Caterwil1.jpg", alt: "Wheelchair accessory 2" },
-    { id: 3, src: "/assets/images/Caterwil4.jpg", alt: "Wheelchair accessory 3" },
-    { id: 4, src: "/assets/images/Caterwil3.jpg", alt: "Wheelchair accessory 4" },
-    { id: 5, src: "/assets/images/Caterwil5.jpg", alt: "Wheelchair accessory 5" },
-  ];
-
   return (
     <div className={`image-viewer-wrapper ${fullscreenImage ? 'fullscreen-modal-open' : ''} ${isModalOpen ? 'modal-active' : ''}`}>
       <div className="viewer-container">
@@ -404,12 +443,44 @@ const ImageViewer = ({ parts, onPartClick, isModalOpen }) => {
 
       {fullscreenImage && (
         <div className="fullscreen-modal" onClick={closeFullscreen}>
-          <div className="fullscreen-content" onClick={(e) => e.stopPropagation()}>
+          <div 
+            className="fullscreen-content" 
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleFullscreenTouchStart}
+            onTouchMove={handleFullscreenTouchMove}
+            onTouchEnd={handleFullscreenTouchEnd}
+          >
+            <button 
+              className="nav-button prev-button" 
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateFullscreen('prev');
+              }}
+            >
+              &lt;
+            </button>
+            
             <img 
+              ref={fullscreenImageRef}
               src={fullscreenImage} 
               alt="Fullscreen view"
               className="fullscreen-image"
             />
+            
+            <button 
+              className="nav-button next-button" 
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateFullscreen('next');
+              }}
+            >
+              &gt;
+            </button>
+            
+            <div className="image-counter">
+              {currentFullscreenIndex + 1} / {thumbnails.length}
+            </div>
+            
             <button className="close-button" onClick={closeFullscreen}>
               &times;
             </button>
